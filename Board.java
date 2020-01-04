@@ -77,4 +77,38 @@ public class Board
             }
         }
     }
+    
+    public static void deleteShip(String[][] shipBoard, String shipSymbol)
+    {
+        for(int r = 0; r<shipBoard.length; r++)
+        {
+            for(int c = 0; c<shipBoard[0].length; c++)
+            {
+                if(shipBoard[r][c].equals(shipSymbol))
+                {
+                    shipBoard[r][c] = "▢";
+                }
+            }
+        }
+    }
+    
+    public static boolean checkOneRemaining(String[][] shipBoard, String shipSymbol)
+    {
+        int remainingParts = 0;
+        for(int r = 0; r<shipBoard.length; r++)
+        {
+            for(int c = 0; c<shipBoard[0].length; c++)
+            {
+                if(shipBoard[r][c].equals(shipSymbol))
+                {
+                    remainingParts++;
+                }
+            }
+        }
+        if(remainingParts == 1)
+        {
+            return true;
+        }
+        return false;
+    }
 }

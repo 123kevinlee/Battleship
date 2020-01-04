@@ -13,6 +13,7 @@ public class Player
     private String[][] torpedoBoard = new String[10][10];
     private Player opponent;
     public void setOpponent(Player opponent){this.opponent = opponent;}
+
     public Player(String name)
     {
         this.name = name;
@@ -22,104 +23,143 @@ public class Player
     }
 
     private void setupShips()
-    {    
+    {   
         Scanner input = new Scanner(System.in);
-        String positionInputRegex = "^(([A-J]{1})||([a-j]{1}))+,+([1-9]{1}||10)$";
-
         for(int ships = 0; ships<3; ships++)
         {
-            System.out.println("\f" + name + " Board Setup");
+            setShip(ships);
+        }      
+        boolean satisfied = false;
+        while(!satisfied)
+        {
+            System.out.println("\fHere is your final layout...");
             Board.display(shipBoard);
-            int shipLength = 0;
-            String symbol = "";
-            switch (ships) {
-                case 0:  
-                    shipLength = 4;
-                    symbol = "C";
-                    break;
-                case 1:  
-                    shipLength = 4; 
-                    symbol = "D";
-                    break;
-                case 2:  
-                    shipLength = 5; 
-                    symbol = "B";
-                    break;
-                default: 
-                    shipLength = 3; 
-                    symbol = "U";
-                    break;
-            }
-
-            boolean validStartPosition = false;
-            while(!validStartPosition)
+            System.out.print("Are you satisfied with this layout[y/n]: ");
+            if(!input.nextLine().toLowerCase().equals("y"))
             {
-                switch (ships) {
-                    case 0:  System.out.print("Starting coordinate for the Cruiser Ex. letter,number: ");
-                    break;
-                    case 1:  System.out.print("Starting coordinate for the Destroyer Ex. letter,number: ");
-                    break;
-                    case 2:  System.out.print("Starting coordinate for the Battleship Ex. letter,number: ");
-                    break;
-                    default: System.out.print("Starting coordinate for ship number " + ships + " Ex. letter,number: ");
-                    break;
-                }
-                String position = input.nextLine();
-                if(position.matches(positionInputRegex))
-                {
-                    String[] firstPosCoords = position.split(",");
-                    String temp = firstPosCoords[1];
-                    firstPosCoords[1] = Integer.toString((int)(firstPosCoords[0].toUpperCase().charAt(0))-64);
-                    firstPosCoords[0] = temp;
 
-                    if(Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0]), Integer.parseInt(firstPosCoords[1]), "▢"))
+                boolean validShip = false;
+                while(!validShip)
+                {
+                    System.out.print("What ship do you want to change [1,2,3]: ");
+                    String resp = input.nextLine();
+                    if(resp.matches("^[1-3]{1}$"))
                     {
-                        validStartPosition = true;
-                        boolean validDirection = false;
-                        while(!validDirection)
-                        {
-                            System.out.print("What direction do you want the ship to go[U,D,L,R]: ");
-                            String direction = input.nextLine().toLowerCase();
-                            if(direction.equals("u") || direction.equals("d") || direction.equals("l") || direction.equals("r"))
-                            {
-                                if(checkValidShipPos(firstPosCoords, shipLength, direction, shipBoard))
-                                {
-                                    validDirection = true;
-                                    Board.placeShip(firstPosCoords, shipLength, direction, shipBoard, symbol);
-                                }
-                                else
-                                {
-                                    System.out.print("*Ship cannot be placed that direction* Do you wish to change the start position[y/n]: ");
-                                    if(input.nextLine().toLowerCase().equals("y"))
-                                    {
-                                        validStartPosition = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                System.out.print("*Invalid direction input - Please try again* ");
-                            }
+                        validShip = true;
+                        switch (Integer.parseInt(resp)) {
+                            case 1:  Board.deleteShip(shipBoard, "C");                            
+                            break;
+                            case 2:  Board.deleteShip(shipBoard, "D");                            
+                            break;
+                            case 3:  Board.deleteShip(shipBoard, "B");
+                            break;
                         }
+                        setShip(Integer.parseInt(resp)-1);
                     }
                     else
                     {
-                        System.out.print("*Another ship is at that coordinate - Please try again* ");
+                        System.out.print("*That is not a ship - Please try again* ");
+                    }
+                }
+            }
+            else
+            {
+                satisfied = true;
+            }
+        }
+    }
+
+    private void setShip(int shipNum)
+    {
+        Scanner input = new Scanner(System.in);
+        String positionInputRegex = "^(([A-J]{1})||([a-j]{1}))+,+([1-9]{1}||10)$"; //returns true if first char is A-J or a-j, second char is a comma, and third char is 1-10
+        System.out.println("\f" + name + " Board Setup");
+        Board.display(shipBoard);
+
+        int shipLength = 0;
+        String symbol = "";
+        switch (shipNum) {
+            case 0:  //Cruiser
+            shipLength = 4;
+            symbol = "C";
+            break;
+            case 1:  //Destroyer
+            shipLength = 4; 
+            symbol = "D";
+            break;
+            case 2:  //Battleship
+            shipLength = 5; 
+            symbol = "B";
+            break;
+            default: //Rando
+            shipLength = 3; 
+            symbol = "U";
+            break;
+        }
+
+        boolean validStartPosition = false;
+        while(!validStartPosition)
+        {
+            switch (shipNum) {
+                case 0:  System.out.print("Starting coordinate for the Cruiser Ex. letter,number: ");
+                break;
+                case 1:  System.out.print("Starting coordinate for the Destroyer Ex. letter,number: ");
+                break;
+                case 2:  System.out.print("Starting coordinate for the Battleship Ex. letter,number: ");
+                break;
+                default: System.out.print("Starting coordinate for ship number " + shipNum + " Ex. letter,number: ");
+                break;
+            }
+
+            String position = input.nextLine();
+            if(position.matches(positionInputRegex))
+            {
+                String[] firstPosCoords = position.split(",");
+                String temp = firstPosCoords[1];
+                firstPosCoords[1] = Integer.toString((int)(firstPosCoords[0].toUpperCase().charAt(0))-64);
+                firstPosCoords[0] = temp;
+
+                if(Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0]), Integer.parseInt(firstPosCoords[1]), "▢"))
+                {
+                    validStartPosition = true;
+                    boolean validDirection = false;
+                    while(!validDirection)
+                    {
+                        System.out.print("What direction do you want the ship to go[U,D,L,R]: ");
+                        String direction = input.nextLine().toLowerCase();
+                        if(direction.equals("u") || direction.equals("d") || direction.equals("l") || direction.equals("r"))
+                        {
+                            if(checkValidShipPos(firstPosCoords, shipLength, direction, shipBoard))
+                            {
+                                validDirection = true;
+                                Board.placeShip(firstPosCoords, shipLength, direction, shipBoard, symbol);
+                            }
+                            else
+                            {
+                                System.out.print("*Ship cannot be placed that direction* Do you wish to change the start position[y/n]: ");
+                                if(input.nextLine().toLowerCase().equals("y"))
+                                {
+                                    validStartPosition = false;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            System.out.print("*Invalid direction input - Please try again* ");
+                        }
                     }
                 }
                 else
                 {
-                    System.out.print("*Invalid coordinate input - Please try again* ");
+                    System.out.print("*Another ship is at that coordinate - Please try again* ");
                 }
-                //Ask for start pos and error check
-                //ask for direction and error check
-                //calculate positions and set them to respective ship pos arrays
-                //create a ship for each one
+            }
+            else
+            {
+                System.out.print("*Invalid coordinate input - Please try again* ");
             }
         }
-        System.out.println("\fHere is your final ship board");
-        Board.display(shipBoard);
     }
 
     private boolean checkValidShipPos(String[] firstPosCoords, int length, String direction, String[][]board)
@@ -202,71 +242,72 @@ public class Player
         }
         return false;
     }
-    
+
     public boolean turn()
     {
         String positionInputRegex = "^(([A-J]{1})||([a-j]{1}))+,+([1-9]{1}||10)$";
         Scanner input = new Scanner(System.in);
-        
+
         System.out.println("\f" + name + "'s turn");
         System.out.println("Torpedo Board");
         Board.display(torpedoBoard);
         System.out.println("Ship Board");
         Board.display(shipBoard);
-        
-        boolean validCoord = false;
-            while(!validCoord)
-            {
-                System.out.print("Where would you like to fire Ex. letter,number:  ");
-                String position = input.nextLine();
-                if(position.matches(positionInputRegex))
-                {
-                    String[] coords = position.split(",");
-                    String temp = coords[1];
-                    coords[1] = Integer.toString((int)(coords[0].toUpperCase().charAt(0))-64);
-                    coords[0] = temp;
 
-                    if(!Board.checkIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "X") || !Board.checkIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "O"))
+        boolean validCoord = false;
+        while(!validCoord)
+        {
+            System.out.print("Where would you like to fire Ex. letter,number:  ");
+            String position = input.nextLine();
+            if(position.matches(positionInputRegex))
+            {
+                String[] coords = position.split(",");
+                String temp = coords[1];
+                coords[1] = Integer.toString((int)(coords[0].toUpperCase().charAt(0))-64);
+                coords[0] = temp;
+
+                if(!Board.checkIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "X") && !Board.checkIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "O"))
+                {
+                    validCoord = true;
+                    if(Board.checkIndex(opponent.getShipBoard(),Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "▢"))
                     {
-                        validCoord = true;
-                        if(Board.checkIndex(opponent.getShipBoard(),Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "▢"))
-                        {
-                            Board.changeIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "O");
-                            System.out.println("\f");
-                            Board.display(torpedoBoard);
-                            System.out.println("You have missed...");
-                        }
-                        else
-                        {
-                            Board.changeIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "X");
-                            Board.changeIndex(opponent.getShipBoard(),Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "F");      
-                            System.out.println("\f");
-                            Board.display(torpedoBoard);
-                            System.out.println("You have hit a ship!");
-                        }
-                        
+                        Board.changeIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "O");
+                        System.out.println("\f");
+                        Board.display(torpedoBoard);
+                        System.out.println("You have missed...");
                     }
                     else
                     {
-                        System.out.print("*You have already fired there - Please try again* ");
+                        boolean sunkShip = Board.checkOneRemaining(opponent.getShipBoard(), opponent.getShipBoard()[Integer.parseInt(coords[0])-1][Integer.parseInt(coords[1])-1]);
+                        Board.changeIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "X");
+                        Board.changeIndex(opponent.getShipBoard(),Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "F");      
+                        System.out.println("\f");
+                        Board.display(torpedoBoard);
+                        System.out.println(sunkShip?"You have sunk a ship!":"You have hit a ship!");
                     }
+
                 }
                 else
                 {
-                    System.out.print("*Invalid coordinate input - Please try again* ");
+                    System.out.print("*You have already fired there - Please try again* ");
                 }
             }
-        return checkLoss();
+            else
+            {
+                System.out.print("*Invalid coordinate input - Please try again* ");
+            }
+        }
+        return checkWin();
     }
 
-    private boolean checkLoss()
+    private boolean checkWin()
     {
-       boolean hasShips = false;
-       for(int r = 0; r<shipBoard.length; r++)
+        boolean hasShips = false;
+        for(int r = 0; r<opponent.getShipBoard().length; r++)
         {
-            for(int c = 0; c<shipBoard[r].length; c++)
+            for(int c = 0; c<opponent.getShipBoard()[r].length; c++)
             {
-                if(shipBoard[r][c].equals("C") || !shipBoard[r][c].equals("D") || shipBoard[r][c].equals("B") || shipBoard[r][c].equals("U"))
+                if(opponent.getShipBoard()[r][c].equals("C") || opponent.getShipBoard()[r][c].equals("D") || opponent.getShipBoard()[r][c].equals("B") || opponent.getShipBoard()[r][c].equals("U"))
                 {
                     hasShips = true;
                 }

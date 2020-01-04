@@ -20,6 +20,7 @@ public class Battleship
                 exit = true;
             }
         }
+        System.out.println("\fGoodbye!");
     }
 
     public static void runGame()
@@ -55,6 +56,6 @@ public class Battleship
                 playerTurn = !playerTurn;
             }
         }
-        System.out.println(playerTurn?"Player 1 won!":"Player 2 won!");
+        System.out.println(!playerTurn?"Player 1 won!":"Player 2 won!");
     }
 }
