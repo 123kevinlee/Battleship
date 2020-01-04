@@ -17,7 +17,7 @@ public class Board
         }
     }
 
-    public static void display(String[][] board)
+    public static void display(String[][] board, boolean showKey)
     {
         System.out.print("\n\t");
         for(int r = 0; r<board.length; r++)
@@ -31,6 +31,14 @@ public class Board
             for(int c = 0; c<board[r].length; c++)
             {
                 System.out.print(board[r][c] + "\t");
+            }
+
+            if(showKey)
+            {
+                if(r==3){System.out.print("Symbol Key");}
+                if(r==4){System.out.print("▢ = Empty Space");}
+                if(r==5){System.out.print("X = Hit / O = Miss");}
+                if(r==6){System.out.print("C/D/B = Ships / F = Dead Ships");}
             }
         }
         System.out.println();
@@ -77,7 +85,7 @@ public class Board
             }
         }
     }
-    
+
     public static void deleteShip(String[][] shipBoard, String shipSymbol)
     {
         for(int r = 0; r<shipBoard.length; r++)
@@ -91,7 +99,7 @@ public class Board
             }
         }
     }
-    
+
     public static boolean checkOneRemaining(String[][] shipBoard, String shipSymbol)
     {
         int remainingParts = 0;

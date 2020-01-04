@@ -33,7 +33,7 @@ public class Player
         while(!satisfied)
         {
             System.out.println("\fHere is your final layout...");
-            Board.display(shipBoard);
+            Board.display(shipBoard, true);
             System.out.print("Are you satisfied with this layout[y/n]: ");
             if(!input.nextLine().toLowerCase().equals("y"))
             {
@@ -74,7 +74,7 @@ public class Player
         Scanner input = new Scanner(System.in);
         String positionInputRegex = "^(([A-J]{1})||([a-j]{1}))+,+([1-9]{1}||10)$"; //returns true if first char is A-J or a-j, second char is a comma, and third char is 1-10
         System.out.println("\f" + name + " Board Setup");
-        Board.display(shipBoard);
+        Board.display(shipBoard, true);
 
         int shipLength = 0;
         String symbol = "";
@@ -249,10 +249,10 @@ public class Player
         Scanner input = new Scanner(System.in);
 
         System.out.println("\f" + name + "'s turn");
-        System.out.println("Torpedo Board");
-        Board.display(torpedoBoard);
-        System.out.println("Ship Board");
-        Board.display(shipBoard);
+        System.out.println("\t\t\t\tTorpedo Board");
+        Board.display(torpedoBoard, true);
+        System.out.println("\n\t\t\t\tShip Board");
+        Board.display(shipBoard, false);
 
         boolean validCoord = false;
         while(!validCoord)
@@ -273,7 +273,7 @@ public class Player
                     {
                         Board.changeIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "O");
                         System.out.println("\f");
-                        Board.display(torpedoBoard);
+                        Board.display(torpedoBoard, true);
                         System.out.println("You have missed...");
                     }
                     else
@@ -282,7 +282,7 @@ public class Player
                         Board.changeIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "X");
                         Board.changeIndex(opponent.getShipBoard(),Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "F");      
                         System.out.println("\f");
-                        Board.display(torpedoBoard);
+                        Board.display(torpedoBoard, true);
                         System.out.println(sunkShip?"You have sunk a ship!":"You have hit a ship!");
                     }
 
