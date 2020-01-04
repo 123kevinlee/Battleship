@@ -2,6 +2,11 @@
 Project recreating the battleship game in java
 
 <h3>Topics</h3>
-2D Arrays
-Loops
-Regular Expressions
+<ul>
+  <li>OOP</li>
+  <li>Decision Making</li>
+  <li>Loops</li>
+  <li>2D Arrays</li>
+  <li>Regular Expressions</li>
+</ul>
+
