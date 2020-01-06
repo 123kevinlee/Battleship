@@ -95,9 +95,11 @@ public class BattleshipS
                 {
                     if(start == false) //name == "p1" && 
                     {
+                        output.println("MESSAGE \f");
                         output.println("TURN" + Arrays.deepToString(opponent.shipBoard) + "&" + Arrays.deepToString(shipBoard));
                         opponent.output.println("WAIT");
                         start = true;
+                        opponent.start = true;
                         System.out.println("[" + java.time.LocalTime.now() + "] " + name + "'s turn");
                     }
                     else
@@ -113,12 +115,11 @@ public class BattleshipS
                             String[][] prevShipBoard = opponent.shipBoard;
                             opponent.shipBoard = Board.Arrayify(arrayData);
                             System.out.println("[" + java.time.LocalTime.now() + "] Recieved updated board for" + opponent.name + "\n" + arrayData);
-                            
-                            if(Board.checkHitShip(prevShipBoard, opponent.shipBoard)[0] != -1)
+                            int[]hitCoords = Board.checkHitShip(prevShipBoard, opponent.shipBoard);
+                            String hitCoordsS = (char)(hitCoords[0]+65) + Integer.toString((hitCoords[1] + 1));
+                            String hitShipSymbol = prevShipBoard[hitCoords[0]][hitCoords[1]];
+                            if(hitCoords[0] != -1)
                             {
-                                int[]hitCoords = Board.checkHitShip(prevShipBoard, opponent.shipBoard);
-                                String hitCoordsS = (char)(hitCoords[0]+65) + Integer.toString((hitCoords[1] + 1));
-                                String hitShipSymbol = prevShipBoard[hitCoords[0]][hitCoords[1]];
                                 switch (hitShipSymbol)
                                 {
                                     case "C": 
@@ -146,8 +147,6 @@ public class BattleshipS
                             }
                             else
                             {
-                                int[]hitCoords = Board.checkHitShip(prevShipBoard, opponent.shipBoard);
-                                String hitCoordsS = (char)(hitCoords[0]+65) + Integer.toString((hitCoords[1] + 1));
                                 opponent.output.println("MESSAGE " + name + " fired at " + hitCoordsS + " and missed");
                             }
 
@@ -160,7 +159,7 @@ public class BattleshipS
                             }
                             output.println("WAIT");
                             opponent.output.println("TURN" + Arrays.deepToString(shipBoard) + "&" + Arrays.deepToString(opponent.shipBoard));
-                            System.out.println("[" + java.time.LocalTime.now() + "] " + name + "'s turn");
+                            System.out.println("[" + java.time.LocalTime.now() + "] " + opponent.name + "'s turn");
                         }
                     }
                 }

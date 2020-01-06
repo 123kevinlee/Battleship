@@ -111,6 +111,7 @@ public class Client
             else
             {
                 satisfied = true;
+                System.out.println("Your opponent is still setting up their board... please wait");
             }
         }
     }
