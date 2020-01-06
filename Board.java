@@ -12,7 +12,7 @@ public class Board
         {
             for(int c = 0; c<board[r].length; c++)
             {
-                board[r][c] = "▢";
+                board[r][c] = "-";
             }
         }
     }
@@ -36,7 +36,7 @@ public class Board
             if(showKey)
             {
                 if(r==3){System.out.print("Symbol Key");}
-                if(r==4){System.out.print("▢ = Empty Space");}
+                if(r==4){System.out.print("- = Empty Space");}
                 if(r==5){System.out.print("X = Hit / O = Miss");}
                 if(r==6){System.out.print("C/D/B = Ships / F = Dead Ships");}
             }
@@ -94,7 +94,7 @@ public class Board
             {
                 if(shipBoard[r][c].equals(shipSymbol))
                 {
-                    shipBoard[r][c] = "▢";
+                    shipBoard[r][c] = "-";
                 }
             }
         }

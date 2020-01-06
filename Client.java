@@ -166,7 +166,7 @@ public class Client
                 firstPosCoords[1] = Integer.toString((int)(firstPosCoords[0].toUpperCase().charAt(0))-64);
                 firstPosCoords[0] = temp;
 
-                if(Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0]), Integer.parseInt(firstPosCoords[1]), "▢"))
+                if(Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0]), Integer.parseInt(firstPosCoords[1]), "-"))
                 {
                     validStartPosition = true;
                     boolean validDirection = false;
@@ -220,7 +220,7 @@ public class Client
             boolean allEmpty = true;
             for(int i = 1; i<length; i++)
             {
-                if(!Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0])-i, Integer.parseInt(firstPosCoords[1]), "▢"))
+                if(!Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0])-i, Integer.parseInt(firstPosCoords[1]), "-"))
                 {
                     allEmpty = false;
                 }
@@ -239,7 +239,7 @@ public class Client
             boolean allEmpty = true;
             for(int i = 1; i<length; i++)
             {
-                if(!Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0])+i, Integer.parseInt(firstPosCoords[1]), "▢"))
+                if(!Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0])+i, Integer.parseInt(firstPosCoords[1]), "-"))
                 {
                     allEmpty = false;
                 }
@@ -258,7 +258,7 @@ public class Client
             boolean allEmpty = true;
             for(int i = 1; i<length; i++)
             {
-                if(!Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0]), Integer.parseInt(firstPosCoords[1]) - i, "▢"))
+                if(!Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0]), Integer.parseInt(firstPosCoords[1]) - i, "-"))
                 {
                     allEmpty = false;
                 }
@@ -277,7 +277,7 @@ public class Client
             boolean allEmpty = true;
             for(int i = 1; i<length; i++)
             {
-                if(!Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0]), Integer.parseInt(firstPosCoords[1]) + i, "▢"))
+                if(!Board.checkIndex(shipBoard,Integer.parseInt(firstPosCoords[0]), Integer.parseInt(firstPosCoords[1]) + i, "-"))
                 {
                     allEmpty = false;
                 }
@@ -315,7 +315,7 @@ public class Client
                 if(!Board.checkIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "X") && !Board.checkIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "O"))
                 {
                     validCoord = true;
-                    if(Board.checkIndex(shipBoardOp,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "▢"))
+                    if(Board.checkIndex(shipBoardOp,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "-"))
                     {
                         Board.changeIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "O");
                         System.out.println("\f");
