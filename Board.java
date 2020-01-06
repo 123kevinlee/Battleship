@@ -161,7 +161,7 @@ public class Board
             {
                 for(int c = 0; c<oldShipBoard[r].length; c++)
                 {
-                    if(oldShipBoard[r][c] != newShipBoard[r][c])
+                    if(!oldShipBoard[r][c].equals(newShipBoard[r][c]))
                     {
                         return new int[]{r,c};
                     }

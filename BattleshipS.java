@@ -116,10 +116,10 @@ public class BattleshipS
                             opponent.shipBoard = Board.Arrayify(arrayData);
                             System.out.println("[" + java.time.LocalTime.now() + "] Recieved updated board for" + opponent.name + "\n" + arrayData);
                             int[]hitCoords = Board.checkHitShip(prevShipBoard, opponent.shipBoard);
-                            String hitCoordsS = (char)(hitCoords[0]+65) + Integer.toString((hitCoords[1] + 1));
-                            String hitShipSymbol = prevShipBoard[hitCoords[0]][hitCoords[1]];
+                            String hitCoordsS = (char)(hitCoords[1]+65) + Integer.toString((hitCoords[0] + 1));                   
                             if(hitCoords[0] != -1)
                             {
+                                String hitShipSymbol = prevShipBoard[hitCoords[0]][hitCoords[1]];
                                 switch (hitShipSymbol)
                                 {
                                     case "C": 
@@ -134,10 +134,6 @@ public class BattleshipS
                                     opponent.output.println("MESSAGE \fYour Battleship was hit at " + hitCoordsS);
                                     System.out.println(opponent.name + "s Battleship was hit at " + hitCoordsS);
                                     break;
-                                    default: 
-                                    opponent.output.println("MESSAGE \fOne of your ships was hit at " + hitCoordsS);
-                                    System.out.println("One of " + opponent.name + "s ships was hit at " + hitCoordsS);
-                                    break;
                                 }
                                 if(Board.checkOneRemaining(prevShipBoard, hitShipSymbol))
                                 {
@@ -145,10 +141,10 @@ public class BattleshipS
                                     System.out.println(opponent.name + "s ship was sunk");
                                 }                
                             }
-                            else
-                            {
-                                opponent.output.println("MESSAGE " + name + " fired at " + hitCoordsS + " and missed");
-                            }
+                            // else
+                            // {
+                                // opponent.output.println("MESSAGE " + name + " fired at " + hitCoordsS + " and missed");
+                            // }
 
                             if(checkWin(opponent.shipBoard))
                             {
