@@ -30,7 +30,7 @@ public class BattleshipS
         private String name;
         private String[][] shipBoard = new String[10][10];
         private SPlayer opponent;
-        private boolean ready = false, start = false;
+        private boolean ready = false, start = false, win = false;
         private Socket socket;
         private Scanner input;
         private PrintWriter output;
@@ -93,7 +93,7 @@ public class BattleshipS
                 }
                 if (ready && opponent.ready)
                 {
-                    if(start == false) //name == "p1" && 
+                    if(start == false) 
                     {
                         output.println("MESSAGE \f");
                         output.println("TURN" + Arrays.deepToString(opponent.shipBoard) + "&" + Arrays.deepToString(shipBoard));
@@ -141,17 +141,12 @@ public class BattleshipS
                                     System.out.println(opponent.name + "s ship was sunk");
                                 }                
                             }
-                            // else
-                            // {
-                                // opponent.output.println("MESSAGE " + name + " fired at " + hitCoordsS + " and missed");
-                            // }
 
                             if(checkWin(opponent.shipBoard))
                             {
                                 System.out.println(name + " won the game");
                                 output.println("MESSAGE You have won!");
                                 opponent.output.println("MESSAGE You have lost...");
-                                return;
                             }
                             output.println("WAIT");
                             opponent.output.println("TURN" + Arrays.deepToString(shipBoard) + "&" + Arrays.deepToString(opponent.shipBoard));
