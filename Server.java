@@ -17,7 +17,7 @@ import java.util.Scanner;
 import java.util.concurrent.Executors;
 public class Server
 {
-    public static void main() throws Exception {
+    public static void main(String[] args) throws Exception {
         int port = 58901;
         String ip = InetAddress.getLocalHost().getHostAddress();
         try (var listener = new ServerSocket(port))
@@ -27,8 +27,8 @@ public class Server
             while(true)
             {
                 BattleshipS game = new BattleshipS();
-                pool.execute(game.new Player(listener.accept(), "p1"));
-                pool.execute(game.new Player(listener.accept(), "p2"));
+                pool.execute(game.new SPlayer(listener.accept(), "p1"));
+                pool.execute(game.new SPlayer(listener.accept(), "p2"));
             }
         }
     }

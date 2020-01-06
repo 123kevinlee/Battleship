@@ -7,7 +7,7 @@ import java.util.Scanner;
 import java.util.concurrent.Executors;
 public class BattleshipS
 {
-    private Player currentPlayer;
+    private SPlayer currentPlayer;
 
     private static boolean checkWin(String[][] shipBoard)
     {
@@ -25,17 +25,17 @@ public class BattleshipS
         return !hasShips;
     }
 
-    public class Player implements Runnable 
+    public class SPlayer implements Runnable 
     {
         private String name;
         private String[][] shipBoard = new String[10][10];
-        private Player opponent;
+        private SPlayer opponent;
         private boolean ready = false, start = false;
         private Socket socket;
         private Scanner input;
         private PrintWriter output;
 
-        public Player(Socket socket, String name)
+        public SPlayer(Socket socket, String name)
         {
             this.socket = socket;
             this.name = name;

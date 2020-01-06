@@ -14,7 +14,7 @@ public class Client
     public static String[][] torpedoBoard = new String[10][10];
     public static String[][] shipBoardOp = new String[10][10];
 
-    public static void main() throws Exception
+    public static void main(String[]args) throws Exception
     {
         Scanner input = new Scanner(System.in);
         System.out.print("Server IP: ");
