@@ -119,4 +119,54 @@ public class Board
         }
         return false;
     }
+    
+    public static String[][] Arrayify (String str) {
+            int row = 0;
+            int col = 0;
+            for (int i = 0; i < str.length(); i++) {
+                if (str.charAt(i) == '[') {
+                    row++;
+                }
+            }
+            row--;
+            for (int i = 0;; i++) {
+                if (str.charAt(i) == ',') {
+                    col++;
+                }
+                if (str.charAt(i) == ']') {
+                    break;
+                }
+            }
+            col++;
+
+            String[][] out = new String[row][col];
+
+            str = str.replaceAll("\\[", "").replaceAll("\\]", "");
+
+            String[] s1 = str.split(", ");
+
+            int j = -1;
+            for (int i = 0; i < s1.length; i++) {
+                if (i % col == 0) {
+                    j++;
+                }
+                out[j][i % col] = s1[i];
+            }
+            return out;
+        }
+        
+        public static int[] checkHitShip(String[][] oldShipBoard, String[][] newShipBoard)
+        {
+            for(int r = 0; r<oldShipBoard.length; r++)
+            {
+                for(int c = 0; c<oldShipBoard[r].length; c++)
+                {
+                    if(oldShipBoard[r][c] != newShipBoard[r][c])
+                    {
+                        return new int[]{r,c};
+                    }
+                }
+            }
+            return new int[]{-1,-1};
+        }
 }

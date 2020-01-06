@@ -12,11 +12,12 @@ public class Client
 {
     public static String[][] shipBoard = new String[10][10];
     public static String[][] torpedoBoard = new String[10][10];
-        
+    public static String[][] shipBoardOp = new String[10][10];
+
     public static void main() throws Exception
     {
         Scanner input = new Scanner(System.in);
-        System.out.println("Server IP: ");
+        System.out.print("Server IP: ");
         String[] ip = input.nextLine().split(":");
         Socket socket = new Socket(ip[0], Integer.parseInt(ip[1]));
         Scanner serverIn = new Scanner(socket.getInputStream());
@@ -27,12 +28,9 @@ public class Client
     private static void play(Socket socket, Scanner serverIn, PrintWriter clientOut) throws Exception
     {
         Scanner input = new Scanner(System.in);
-        
+
         Board.setBlankBoard(shipBoard);
         Board.setBlankBoard(torpedoBoard);  
-
-        String[][] shipBoardOp = new String[10][10];
-        String[][] torpedoBoardOp = new String[10][10];
 
         try
         {
@@ -46,11 +44,20 @@ public class Client
                 else if(response.startsWith("SETUP"))
                 {
                     setupShips();
-                    System.out.println(Arrays.deepToString(shipBoard));
+                    clientOut.println("SETUP" + Arrays.deepToString(shipBoard));
                 }
                 else if(response.startsWith("TURN"))
                 {
-                    System.out.println("Your turn");
+                    String arrayDataOp = response.substring(4,response.indexOf("&"));
+                    shipBoardOp = Board.Arrayify(arrayDataOp);
+                    String arrayData = response.substring(response.indexOf("&")+1);
+                    shipBoard = Board.Arrayify(arrayData);
+                    turn();
+                    clientOut.println("TURN" + Arrays.deepToString(shipBoardOp));
+                }
+                else if(response.startsWith("WAIT"))
+                {
+                    System.out.println("Waiting for opponent to finish turn...");
                 }
             }
         } catch (Exception e) {
@@ -281,4 +288,75 @@ public class Client
         }
         return false;
     }
+
+    public static boolean turn()
+    {
+        String positionInputRegex = "^(([A-J]{1})||([a-j]{1}))+,+([1-9]{1}||10)$";
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("\t\t\t\tTorpedo Board");
+        Board.display(torpedoBoard, true);
+        System.out.println("\n\t\t\t\tShip Board");
+        Board.display(shipBoard, false);
+
+        boolean validCoord = false;
+        while(!validCoord)
+        {
+            System.out.print("Where would you like to fire Ex. letter,number:  ");
+            String position = input.nextLine();
+            if(position.matches(positionInputRegex))
+            {
+                String[] coords = position.split(",");
+                String temp = coords[1];
+                coords[1] = Integer.toString((int)(coords[0].toUpperCase().charAt(0))-64);
+                coords[0] = temp;
+
+                if(!Board.checkIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "X") && !Board.checkIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "O"))
+                {
+                    validCoord = true;
+                    if(Board.checkIndex(shipBoardOp,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "▢"))
+                    {
+                        Board.changeIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "O");
+                        System.out.println("\f");
+                        Board.display(torpedoBoard, true);
+                        System.out.println("You have missed...");
+                    }
+                    else
+                    {
+                        boolean sunkShip = Board.checkOneRemaining(shipBoardOp, shipBoardOp[Integer.parseInt(coords[0])-1][Integer.parseInt(coords[1])-1]);
+                        Board.changeIndex(torpedoBoard,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "X");
+                        Board.changeIndex(shipBoardOp,Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), "F");      
+                        System.out.println("\f");
+                        Board.display(torpedoBoard, true);
+                        System.out.println(sunkShip?"You have sunk a ship!":"You have hit a ship!");
+                    }
+
+                }
+                else
+                {
+                    System.out.print("*You have already fired there - Please try again* ");
+                }
+            }
+            else
+            {
+                System.out.print("*Invalid coordinate input - Please try again* ");
+            }
+        }
+        return checkWin();
+    }
+    private static boolean checkWin()
+        {
+            boolean hasShips = false;
+            for(int r = 0; r<shipBoardOp.length; r++)
+            {
+                for(int c = 0; c<shipBoardOp[r].length; c++)
+                {
+                    if(shipBoardOp[r][c].equals("C") ||shipBoardOp[r][c].equals("D") || shipBoardOp[r][c].equals("B") || shipBoardOp[r][c].equals("U"))
+                    {
+                        hasShips = true;
+                    }
+                }
+            }
+            return !hasShips;
+        }
 }

@@ -9,11 +9,26 @@ public class BattleshipS
 {
     private Player currentPlayer;
 
+    private static boolean checkWin(String[][] shipBoard)
+    {
+        boolean hasShips = false;
+        for(int r = 0; r<shipBoard.length; r++)
+        {
+            for(int c = 0; c<shipBoard[r].length; c++)
+            {
+                if(shipBoard[r][c].equals("C") ||shipBoard[r][c].equals("D") || shipBoard[r][c].equals("B") || shipBoard[r][c].equals("U"))
+                {
+                    hasShips = true;
+                }
+            }
+        }
+        return !hasShips;
+    }
+
     public class Player implements Runnable 
     {
         private String name;
         private String[][] shipBoard = new String[10][10];
-        private String[][] torpedoBoard = new String[10][10];
         private Player opponent;
         private boolean ready = false, start = false;
         private Socket socket;
@@ -36,9 +51,9 @@ public class BattleshipS
             }
             catch (Exception e) {e.printStackTrace();}
             finally {
-                if (opponent != null && opponent.output != null)
+                if (opponent != null && opponent.output != null && !checkWin(opponent.shipBoard))
                 {
-                    opponent.output.println("OTHER_PlAYER_LEFT");
+                    opponent.output.println("MESSAGE Other player has left the game");
                 }
                 try {socket.close();} catch (IOException e) {}
             }
@@ -71,25 +86,86 @@ public class BattleshipS
                 if(command.startsWith("SETUP"))
                 {
                     String arrayData = command.substring(5);
+                    shipBoard = Board.Arrayify(arrayData);
+                    opponent.opponent.shipBoard = Board.Arrayify(arrayData);
+                    System.out.println("[" + java.time.LocalTime.now() + "] " + "Recieved setup from " + name + "\n" + arrayData);
                     ready = true;
                 }
                 if (ready && opponent.ready)
                 {
-                    if(name == "p1" && start == false)
+                    if(start == false) //name == "p1" && 
                     {
-                        output.println("TURN");
+                        output.println("TURN" + Arrays.deepToString(opponent.shipBoard) + "&" + Arrays.deepToString(shipBoard));
+                        opponent.output.println("WAIT");
                         start = true;
+                        System.out.println("[" + java.time.LocalTime.now() + "] " + name + "'s turn");
                     }
-                    if(command == "QUIT")
+                    else
                     {
-                        return;
-                    }
-                    else if(command.startsWith("TURN"))
-                    {
+                        if(command.startsWith("QUIT"))
+                        {
+                            System.out.println("[" + java.time.LocalTime.now() + "] " + name + " has quit");
+                            return;
+                        }
+                        else if(command.startsWith("TURN"))
+                        {
+                            String arrayData = command.substring(4);
+                            String[][] prevShipBoard = opponent.shipBoard;
+                            opponent.shipBoard = Board.Arrayify(arrayData);
+                            System.out.println("[" + java.time.LocalTime.now() + "] Recieved updated board for" + opponent.name + "\n" + arrayData);
+                            
+                            if(Board.checkHitShip(prevShipBoard, opponent.shipBoard)[0] != -1)
+                            {
+                                int[]hitCoords = Board.checkHitShip(prevShipBoard, opponent.shipBoard);
+                                String hitCoordsS = (char)(hitCoords[0]+65) + Integer.toString((hitCoords[1] + 1));
+                                String hitShipSymbol = prevShipBoard[hitCoords[0]][hitCoords[1]];
+                                switch (hitShipSymbol)
+                                {
+                                    case "C": 
+                                    opponent.output.println("MESSAGE \fYour Cruiser was hit at " + hitCoordsS);
+                                    System.out.println(opponent.name + "s Cruiser was hit at " + hitCoordsS);
+                                    break;
+                                    case "D": 
+                                    opponent.output.println("MESSAGE \fYour Destroyer was hit at " + hitCoordsS);
+                                    System.out.println(opponent.name + "s Destroyer was hit at " + hitCoordsS);
+                                    break;
+                                    case "B": 
+                                    opponent.output.println("MESSAGE \fYour Battleship was hit at " + hitCoordsS);
+                                    System.out.println(opponent.name + "s Battleship was hit at " + hitCoordsS);
+                                    break;
+                                    default: 
+                                    opponent.output.println("MESSAGE \fOne of your ships was hit at " + hitCoordsS);
+                                    System.out.println("One of " + opponent.name + "s ships was hit at " + hitCoordsS);
+                                    break;
+                                }
+                                if(Board.checkOneRemaining(prevShipBoard, hitShipSymbol))
+                                {
+                                    opponent.output.println("MESSAGE It was sunk");
+                                    System.out.println(opponent.name + "s ship was sunk");
+                                }                
+                            }
+                            else
+                            {
+                                int[]hitCoords = Board.checkHitShip(prevShipBoard, opponent.shipBoard);
+                                String hitCoordsS = (char)(hitCoords[0]+65) + Integer.toString((hitCoords[1] + 1));
+                                opponent.output.println("MESSAGE " + name + " fired at " + hitCoordsS + " and missed");
+                            }
 
+                            if(checkWin(opponent.shipBoard))
+                            {
+                                System.out.println(name + " won the game");
+                                output.println("MESSAGE You have won!");
+                                opponent.output.println("MESSAGE You have lost...");
+                                return;
+                            }
+                            output.println("WAIT");
+                            opponent.output.println("TURN" + Arrays.deepToString(shipBoard) + "&" + Arrays.deepToString(opponent.shipBoard));
+                            System.out.println("[" + java.time.LocalTime.now() + "] " + name + "'s turn");
+                        }
                     }
                 }
             }
-        }
+        }   
     }
 }
+

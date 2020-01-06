@@ -23,7 +23,7 @@ public class Server
         try (var listener = new ServerSocket(port))
         {
             System.out.println("Battleship server is running on " + ip + ":" + port);
-            var pool = Executors.newFixedThreadPool(2);
+            var pool = Executors.newFixedThreadPool(20);
             while(true)
             {
                 BattleshipS game = new BattleshipS();
