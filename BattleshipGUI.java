@@ -1,14 +1,15 @@
+import javafx.application.Application; 
+import javafx.scene.Scene; 
+import javafx.scene.control.*; 
+import javafx.scene.layout.*; 
+import javafx.stage.Stage; 
+import javafx.scene.layout.*; 
+import javafx.scene.paint.*; 
+import javafx.scene.text.*; 
+import javafx.geometry.*; 
+import javafx.scene.layout.*; 
+import javafx.scene.shape.*; 
 
-
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
 
 /**
  * Write a description of JavaFX class BattleshipGUI here.
@@ -18,54 +19,71 @@ import javafx.stage.Stage;
  */
 public class BattleshipGUI extends Application
 {
-    // We keep track of the count, and label displaying the count:
-    private int count = 0;
-    private Label myLabel = new Label("0");
+    private Label title = new Label("Battleship");
+    
+    private Button[][] torpedoBoard = new Button[10][10];
 
-    /**
-     * The start method is the main entry point for every JavaFX application. 
-     * It is called after the init() method has returned and after 
-     * the system is ready for the application to begin running.
-     *
-     * @param  stage the primary stage for this application.
-     */
     @Override
     public void start(Stage stage)
     {
-        // Create a Button or any control item
-        Button myButton = new Button("Count");
+        title.setFont(new Font("Arial", 24));;
+        for(int r = 0; r<torpedoBoard.length; r++)
+        {
+            for(int c = 0; c<torpedoBoard.length; c++)
+            {
+                torpedoBoard[r][c] = new Button("   ");
+                torpedoBoard[r][c].setStyle("-fx-background-color: #038cfc");
+            }
+        }
 
-        // Create a new grid pane
-        GridPane pane = new GridPane();
-        pane.setPadding(new Insets(10, 10, 10, 10));
-        pane.setMinSize(300, 300);
-        pane.setVgap(10);
-        pane.setHgap(10);
-
-        //set an action on the button using method reference
-        myButton.setOnAction(this::buttonClick);
-
-        // Add the button and label into the pane
-        pane.add(myLabel, 1, 0);
-        pane.add(myButton, 0, 0);
+        BorderPane border = new BorderPane();
+        border.setTop(title);
+        BorderPane.setAlignment(title, Pos.CENTER);
+        border.setCenter(addGridPane());
 
         // JavaFX must have a Scene (window content) inside a Stage (window)
-        Scene scene = new Scene(pane, 300,100);
-        stage.setTitle("JavaFX Example");
+        Scene scene = new Scene(border, 400,400);
+        stage.setTitle("Battleship");
         stage.setScene(scene);
 
         // Show the Stage (window)
-        stage.show();
+        stage.show();   
     }
+    
+    public GridPane addGridPane()
+        {
+            GridPane pane = new GridPane();
+            pane.setPadding(new Insets(10, 10, 10, 10));
+            pane.setMinSize(300, 300);
+            pane.setVgap(10);
+            pane.setHgap(10);
 
+            //set an action on the button using method reference
+            //myButton.setOnAction(this::buttonClick);
+
+            for(int c = 1; c<=torpedoBoard.length;c++)
+            {
+                pane.add(new Label("   " + Character.toString((char)(c+65))),c,0);
+            }
+            for(int r = 1; r<=torpedoBoard.length; r++)
+            {
+                pane.add(new Label(Integer.toString(r)),0,r);
+                for(int c = 1; c<=torpedoBoard.length; c++)
+                {
+                    pane.add(torpedoBoard[r-1][c-1],c,r);
+                }
+            }
+            return pane;
+        }
+        
     /**
      * This will be executed when the button is clicked
      * It increments the count by 1
      */
-    private void buttonClick(ActionEvent event)
-    {
-        // Counts number of button clicks and shows the result on a label
-        count = count + 1;
-        myLabel.setText(Integer.toString(count));
-    }
+    // private void buttonClick(ActionEvent event)
+    // {
+    // // Counts number of button clicks and shows the result on a label
+    // count = count + 1;
+    // myLabel.setText(Integer.toString(count));
+    // }
 }
