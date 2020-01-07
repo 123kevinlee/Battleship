@@ -41,16 +41,69 @@ public class BattleshipGUI extends Application
     private Button confirmPlacement = new Button("Place Ship");
 
     private Stage stage;
+    private Stage gameStage = new Stage();;
 
     private String ip = "";
     private String currentShipPlacementSymbol = "C";
 
     @Override
-    public void start(Stage stage1)
+    public void start(Stage stage)
     {
-        stage = stage1;
-        //setupShips();
-        getIP();     
+        this.stage = stage;
+        Scene scene = new Scene(border, 750,700);
+        stage.setTitle("Battleship");
+        stage.setScene(scene);
+        title.setFont(new Font("Arial", 24));
+        message.setFont(new Font("Arial", 18));
+        border.setTop(title);
+        border.setBottom(message);
+        BorderPane.setAlignment(title, Pos.CENTER);
+        BorderPane.setAlignment(message, Pos.CENTER);
+        Label question = new Label("Server IP:");        
+        Button enterIP = new Button("Join Server");
+        enterIP.setOnAction(this::ipClick);
+        HBox hb = new HBox();
+        hb.getChildren().addAll(question, textField, enterIP);
+        hb.setSpacing(10);
+        border.setCenter(hb);
+        BorderPane.setAlignment(hb, Pos.CENTER);
+        stage.show(); 
+        // while(ip.equals(""))
+        // {
+            // Scene scene = new Scene(border, 750,700);
+            // stage.setTitle("Battleship");
+            // stage.setScene(scene);
+            // title.setFont(new Font("Arial", 24));
+            // message.setFont(new Font("Arial", 18));
+            // border.setTop(title);
+            // border.setBottom(message);
+            // BorderPane.setAlignment(title, Pos.CENTER);
+            // BorderPane.setAlignment(message, Pos.CENTER);
+            // Label question = new Label("Server IP:");        
+            // Button enterIP = new Button("Join Server");
+            // enterIP.setOnAction(this::ipClick);
+            // HBox hb = new HBox();
+            // hb.getChildren().addAll(question, textField, enterIP);
+            // hb.setSpacing(10);
+            // border.setCenter(hb);
+            // BorderPane.setAlignment(hb, Pos.CENTER);
+
+            // //stage.show();  
+            // stage.showAndWait();
+        // }
+        // String[] ipA = ip.split(":");
+        // try
+        // {
+        // Socket socket = new Socket(ipA[0], Integer.parseInt(ipA[1]));
+        // message.setText("Connected to server - waiting for an opponent...");
+        // Scanner serverIn = new Scanner(socket.getInputStream());
+        // PrintWriter clientOut = new PrintWriter(socket.getOutputStream(), true);
+        // this.clientOut = clientOut;
+        // this.serverIn = serverIn;
+        // this.socket = socket;
+        // }catch(Exception e){}
+        setupShips();
+        //getIP();     
     }
 
     private void play(Socket socket, Scanner serverIn, PrintWriter clientOut) throws Exception
@@ -121,8 +174,9 @@ public class BattleshipGUI extends Application
 
     private void ipClick(ActionEvent event)
     {
-        try
-        {ipRun();}catch(Exception e){message.setText("Server either does not exist or is offline");}     
+        // try
+        // {ipRun();}catch(Exception e){message.setText("Server either does not exist or is offline");}   \
+        ip = textField.getText();
     }
 
     private void ipRun() throws Exception
@@ -163,39 +217,22 @@ public class BattleshipGUI extends Application
         // border.setCenter(addTorpedoGridPane());
     }
 
-    private void setupGame()
-    {
-        Scene scene = new Scene(border, 750,700);
-        stage.setTitle("Battleship");
-        stage.setScene(scene);
-        title.setFont(new Font("Arial", 24));
-        message.setFont(new Font("Arial", 18));
-        border.setTop(title);
-        border.setBottom(message);
-        BorderPane.setAlignment(title, Pos.CENTER);
-        BorderPane.setAlignment(message, Pos.CENTER);
-
-        stage.show();  
-    }
-
     private void setupShips()
     {
-        Scene scene1 = new Scene(border, 750,700);
+        //Scene scene = new Scene(border, 750,700);
         //stage.setTitle("Battleship");
         //stage.setScene(scene);
-        title.setFont(new Font("Arial", 24));
-        message.setFont(new Font("Arial", 18));
-        border.setTop(title);
-        border.setBottom(message);
-        BorderPane.setAlignment(title, Pos.CENTER);
-        BorderPane.setAlignment(message, Pos.CENTER);
+        // title.setFont(new Font("Arial", 24));
+        // message.setFont(new Font("Arial", 18));
+        // border.setTop(title);
+        // border.setBottom(message);
+        // BorderPane.setAlignment(title, Pos.CENTER);
+        // BorderPane.setAlignment(message, Pos.CENTER);
         confirmPlacement.setOnAction(this::confirmClick);
         border.setRight(confirmPlacement);
         BorderPane.setAlignment(confirmPlacement, Pos.CENTER);
         BorderPane.setMargin(confirmPlacement, new Insets(0,25,0,0));
         confirmPlacement.setDisable(true);
-        stage.setScene(scene1);
-        stage.show(); 
         
         for(int r = 0; r<shipBoardData.length; r++)
         {
@@ -219,6 +256,10 @@ public class BattleshipGUI extends Application
         border.setCenter(addShipPlacementGridPane());     
 
         message.setText("Choose four blocks for the Cruiser to be placed");
+        
+        Scene scene = new Scene(border, 750,700);
+        stage.setScene(scene);
+        stage.show(); 
     }
 
     private GridPane addShipPlacementGridPane()
