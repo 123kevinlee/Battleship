@@ -49,6 +49,7 @@ public class BattleshipGUI extends Application
     public void start(Stage stage1)
     {
         stage = stage1;
+        //setupShips();
         getIP();     
     }
 
@@ -132,10 +133,10 @@ public class BattleshipGUI extends Application
         message.setText("Connected to server - waiting for an opponent...");
         Scanner serverIn = new Scanner(socket.getInputStream());
         PrintWriter clientOut = new PrintWriter(socket.getOutputStream(), true);
-        play(socket, serverIn, clientOut);
         this.clientOut = clientOut;
         this.serverIn = serverIn;
         this.socket = socket;
+        play(socket, serverIn, clientOut); 
     }
 
     private void turn()
@@ -179,7 +180,7 @@ public class BattleshipGUI extends Application
 
     private void setupShips()
     {
-        //Scene scene = new Scene(border, 750,700);
+        Scene scene1 = new Scene(border, 750,700);
         //stage.setTitle("Battleship");
         //stage.setScene(scene);
         title.setFont(new Font("Arial", 24));
@@ -193,7 +194,8 @@ public class BattleshipGUI extends Application
         BorderPane.setAlignment(confirmPlacement, Pos.CENTER);
         BorderPane.setMargin(confirmPlacement, new Insets(0,25,0,0));
         confirmPlacement.setDisable(true);
-        //stage.show(); 
+        stage.setScene(scene1);
+        stage.show(); 
         
         for(int r = 0; r<shipBoardData.length; r++)
         {
