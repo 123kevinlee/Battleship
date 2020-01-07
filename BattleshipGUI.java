@@ -16,6 +16,7 @@ import javafx.geometry.*;
 import javafx.scene.layout.*; 
 import javafx.scene.shape.*; 
 import javafx.event.*;
+import javafx.application.*;
 
 /**
  * GUI for Battleship
@@ -25,172 +26,147 @@ import javafx.event.*;
  */
 public class BattleshipGUI extends Application
 {   
+    private Stage window;
+    private Scene getIpScene, placeShipsScene, gameScene;
+
     private Socket socket;
     private Scanner serverIn;
     private PrintWriter clientOut;
 
-    private BorderPane border = new BorderPane();
     private Label title = new Label("Battleship");
     private Label message = new Label("Welcome!");
     private TextField textField = new TextField ();
+    private Button confirmPlacement = new Button("Place Ship");
 
     private String[][] torpedoBoardData = new String[10][10];
     private String[][] shipBoardData = new String[10][10];
     private Button[][] torpedoBoard = new Button[10][10];
     private Button[][] placeShipsBoard = new Button[10][10];
-    private Button confirmPlacement = new Button("Place Ship");
 
-    private Stage stage;
-    private Stage gameStage = new Stage();;
-
-    private String ip = "";
     private String currentShipPlacementSymbol = "C";
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage stage)
     {
-        this.stage = stage;
-        Scene scene = new Scene(border, 750,700);
-        stage.setTitle("Battleship");
-        stage.setScene(scene);
+        window = stage;
+
         title.setFont(new Font("Arial", 24));
-        message.setFont(new Font("Arial", 18));
-        border.setTop(title);
-        border.setBottom(message);
-        BorderPane.setAlignment(title, Pos.CENTER);
-        BorderPane.setAlignment(message, Pos.CENTER);
+        message.setFont(new Font("Arial", 20));
+
+        //getIpScene
         Label question = new Label("Server IP:");        
         Button enterIP = new Button("Join Server");
-        enterIP.setOnAction(this::ipClick);
+        enterIP.setOnAction(this::ipClick); 
+
         HBox hb = new HBox();
         hb.getChildren().addAll(question, textField, enterIP);
         hb.setSpacing(10);
-        border.setCenter(hb);
-        BorderPane.setAlignment(hb, Pos.CENTER);
-        stage.show(); 
-        // while(ip.equals(""))
-        // {
-            // Scene scene = new Scene(border, 750,700);
-            // stage.setTitle("Battleship");
-            // stage.setScene(scene);
-            // title.setFont(new Font("Arial", 24));
-            // message.setFont(new Font("Arial", 18));
-            // border.setTop(title);
-            // border.setBottom(message);
-            // BorderPane.setAlignment(title, Pos.CENTER);
-            // BorderPane.setAlignment(message, Pos.CENTER);
-            // Label question = new Label("Server IP:");        
-            // Button enterIP = new Button("Join Server");
-            // enterIP.setOnAction(this::ipClick);
-            // HBox hb = new HBox();
-            // hb.getChildren().addAll(question, textField, enterIP);
-            // hb.setSpacing(10);
-            // border.setCenter(hb);
-            // BorderPane.setAlignment(hb, Pos.CENTER);
 
-            // //stage.show();  
-            // stage.showAndWait();
-        // }
-        // String[] ipA = ip.split(":");
-        // try
-        // {
-        // Socket socket = new Socket(ipA[0], Integer.parseInt(ipA[1]));
-        // message.setText("Connected to server - waiting for an opponent...");
-        // Scanner serverIn = new Scanner(socket.getInputStream());
-        // PrintWriter clientOut = new PrintWriter(socket.getOutputStream(), true);
-        // this.clientOut = clientOut;
-        // this.serverIn = serverIn;
-        // this.socket = socket;
-        // }catch(Exception e){}
-        setupShips();
-        //getIP();     
-    }
+        getIpScene = new Scene(hb, 325,100);
 
-    private void play(Socket socket, Scanner serverIn, PrintWriter clientOut) throws Exception
-    {
-        Board.setBlankBoard(shipBoardData);
-        Board.setBlankBoard(torpedoBoardData);  
-        //setupGame();
+        //placeShipsScene
+        confirmPlacement.setOnAction(this::confirmClick);
+        BorderPane bp = new BorderPane();
+        bp.setTop(title);
+        bp.setBottom(message);
+        BorderPane.setAlignment(title, Pos.CENTER);
+        BorderPane.setMargin(title, new Insets(20,0,20,0));
+        BorderPane.setAlignment(message, Pos.CENTER);
+        BorderPane.setMargin(message, new Insets(20,0,40,0));
 
-        try
+        bp.setRight(confirmPlacement);
+        BorderPane.setAlignment(confirmPlacement, Pos.CENTER);
+        BorderPane.setMargin(confirmPlacement, new Insets(0,25,0,0));
+        confirmPlacement.setDisable(true);
+        
+        //make a configure method
+        for(int r = 0; r<shipBoardData.length; r++)
         {
-            while(serverIn.hasNextLine())
+            for(int c = 0; c<shipBoardData[0].length; c++)
             {
-                var response = serverIn.nextLine();
-                if(response.startsWith("MESSAGE"))
-                {
-                    message.setText(response.substring(8));
-                }
-                else if(response.startsWith("SETUP"))
-                {
-                    setupShips();
-                    //clientOut.println("SETUP" + Arrays.deepToString(shipBoardData));
-                }
-                // else if(response.startsWith("TURN"))
-                // {
-                // String arrayDataOp = response.substring(4,response.indexOf("&"));
-                // shipBoardOp = Board.Arrayify(arrayDataOp);
-                // String arrayData = response.substring(response.indexOf("&")+1);
-                // shipBoard = Board.Arrayify(arrayData);
-                // turn();
-                // clientOut.println("TURN" + Arrays.deepToString(shipBoardOp));
-                // }
-                else if(response.startsWith("WAIT"))
-                {
-                    message.setText("Waiting for opponent to finish turn...");
-                }
-                stage.showAndWait();
+                shipBoardData[r][c] = "   ";
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        finally {
-            socket.close();
-        }
-    }
 
-    private void getIP()
-    {
-        Scene scene = new Scene(border, 750,700);
+        for(int r = 0; r<placeShipsBoard.length; r++)
+        {
+            for(int c = 0; c<placeShipsBoard.length; c++)
+            {
+                placeShipsBoard[r][c] = new Button(shipBoardData[r][c]);
+                placeShipsBoard[r][c].setPrefSize(50,50);
+                placeShipsBoard[r][c].setStyle("-fx-background-color: #038cfc");
+                placeShipsBoard[r][c].setOnAction(this::selectClick);
+            }
+        }
+        
+        GridPane gpS = addShipPlacementGridPane();
+        bp.setCenter(gpS);     
+        BorderPane.setMargin(gpS, new Insets(0,0,0,25));
+        message.setText("Choose four blocks for the Cruiser to be placed");
+        
+        placeShipsScene = new Scene(bp, 750,700);
+
+        //Init
         stage.setTitle("Battleship");
-        stage.setScene(scene);
-        title.setFont(new Font("Arial", 24));
-        message.setFont(new Font("Arial", 18));
-        border.setTop(title);
-        border.setBottom(message);
-        BorderPane.setAlignment(title, Pos.CENTER);
-        BorderPane.setAlignment(message, Pos.CENTER);
-        Label question = new Label("Server IP:");        
-        Button enterIP = new Button("Join Server");
-        enterIP.setOnAction(this::ipClick);
-        HBox hb = new HBox();
-        hb.getChildren().addAll(question, textField, enterIP);
-        hb.setSpacing(10);
-        border.setCenter(hb);
-        BorderPane.setAlignment(hb, Pos.CENTER);
-
-        stage.show();  
+        stage.setScene(getIpScene);
+        stage.show(); 
     }
 
     private void ipClick(ActionEvent event)
     {
-        // try
-        // {ipRun();}catch(Exception e){message.setText("Server either does not exist or is offline");}   \
-        ip = textField.getText();
-    }
+        Button temp = (Button)(event.getSource());
+        new Thread( () -> {
+                try {
+                    String ip = textField.getText();
+                    String[] ipA = ip.split(":");
+                    Socket socket = new Socket(ipA[0], Integer.parseInt(ipA[1]));
+                    temp.setText("Waiting for p2");
+                    Scanner serverIn = new Scanner(socket.getInputStream());
+                    PrintWriter clientOut = new PrintWriter(socket.getOutputStream(), true);
+                    this.clientOut = clientOut;
+                    this.serverIn = serverIn;
+                    this.socket = socket;
 
-    private void ipRun() throws Exception
-    {
-        ip = textField.getText();
-        String[] ipA = ip.split(":");
-        Socket socket = new Socket(ipA[0], Integer.parseInt(ipA[1]));
-        message.setText("Connected to server - waiting for an opponent...");
-        Scanner serverIn = new Scanner(socket.getInputStream());
-        PrintWriter clientOut = new PrintWriter(socket.getOutputStream(), true);
-        this.clientOut = clientOut;
-        this.serverIn = serverIn;
-        this.socket = socket;
-        play(socket, serverIn, clientOut); 
+                    while(serverIn.hasNextLine())
+                    {
+                        var response = serverIn.nextLine();
+                        if(response.startsWith("MESSAGE"))
+                        {
+                            message.setText(response.substring(8));
+                        }
+                        else if(response.startsWith("SETUP"))
+                        {
+                            Platform.runLater(
+                                () -> {
+                                    window.setScene(placeShipsScene);
+                                    message.setText("Choose four blocks for the Cruiser to be placed");
+                                }
+                            );
+                            //clientOut.println("SETUP" + Arrays.deepToString(shipBoardData));
+                        }
+                        // else if(response.startsWith("TURN"))
+                        // {
+                        // String arrayDataOp = response.substring(4,response.indexOf("&"));
+                        // shipBoardOp = Board.Arrayify(arrayDataOp);
+                        // String arrayData = response.substring(response.indexOf("&")+1);
+                        // shipBoard = Board.Arrayify(arrayData);
+                        // turn();
+                        // clientOut.println("TURN" + Arrays.deepToString(shipBoardOp));
+                        // }
+                        else if(response.startsWith("WAIT"))
+                        {
+                            message.setText("Waiting for opponent to finish turn...");
+                        }
+                    }
+                }
+                catch(Exception ex) {
+                    temp.setText(ex.toString());
+                }
+            }).start();
     }
 
     private void turn()
@@ -215,51 +191,6 @@ public class BattleshipGUI extends Application
         // }        
 
         // border.setCenter(addTorpedoGridPane());
-    }
-
-    private void setupShips()
-    {
-        //Scene scene = new Scene(border, 750,700);
-        //stage.setTitle("Battleship");
-        //stage.setScene(scene);
-        // title.setFont(new Font("Arial", 24));
-        // message.setFont(new Font("Arial", 18));
-        // border.setTop(title);
-        // border.setBottom(message);
-        // BorderPane.setAlignment(title, Pos.CENTER);
-        // BorderPane.setAlignment(message, Pos.CENTER);
-        confirmPlacement.setOnAction(this::confirmClick);
-        border.setRight(confirmPlacement);
-        BorderPane.setAlignment(confirmPlacement, Pos.CENTER);
-        BorderPane.setMargin(confirmPlacement, new Insets(0,25,0,0));
-        confirmPlacement.setDisable(true);
-        
-        for(int r = 0; r<shipBoardData.length; r++)
-        {
-            for(int c = 0; c<shipBoardData[0].length; c++)
-            {
-                shipBoardData[r][c] = "   ";
-            }
-        }
-
-        for(int r = 0; r<placeShipsBoard.length; r++)
-        {
-            for(int c = 0; c<placeShipsBoard.length; c++)
-            {
-                placeShipsBoard[r][c] = new Button(shipBoardData[r][c]);
-                placeShipsBoard[r][c].setPrefSize(50,50);
-                placeShipsBoard[r][c].setStyle("-fx-background-color: #038cfc");
-                placeShipsBoard[r][c].setOnAction(this::selectClick);
-            }
-        }
-
-        border.setCenter(addShipPlacementGridPane());     
-
-        message.setText("Choose four blocks for the Cruiser to be placed");
-        
-        Scene scene = new Scene(border, 750,700);
-        stage.setScene(scene);
-        stage.show(); 
     }
 
     private GridPane addShipPlacementGridPane()
@@ -370,12 +301,12 @@ public class BattleshipGUI extends Application
         if(currentShipPlacementSymbol.equals("C"))
         {
             currentShipPlacementSymbol = "D";
-            message.setText("Choose four blocks for the Battleship to be placed");
+            message.setText("Choose four blocks for the Destroyer to be placed");
         }
         else if(currentShipPlacementSymbol.equals("D"))
         {
             currentShipPlacementSymbol = "B";
-            message.setText("Choose five blocks for the Destroyer to be placed");
+            message.setText("Choose five blocks for the Battleship to be placed");
         }
         else if(currentShipPlacementSymbol.equals("B"))
         {
@@ -388,13 +319,14 @@ public class BattleshipGUI extends Application
                 }
             }
             message.setText("Please for your opponent to finish setting up their board...");
-            clientOut.println("SETUP" + Arrays.deepToString(shipBoardData));
+            clientOut.println("SETUP" + Arrays.deepToString(arrayElementTrim(shipBoardData)));
         }
         temp.setDisable(true);
     }
 
     private boolean checkValidPlacement(int length)
     {
+        //fix dis bc it only creates array of desired length not amount of blocks highlighted and also it checks if only 4 are in a row so go back to the for loop method
         int linedUp = 0;
         int[][] selectedButtons = new int[length][2];
         for(int r = 0; r<placeShipsBoard.length; r++)
@@ -423,25 +355,11 @@ public class BattleshipGUI extends Application
         return false;
     }
 
-    private void updateShipArray()
-    {
-        for(int r = 0; r<placeShipsBoard.length; r++)
-        {
-            for(int c = 0; c<placeShipsBoard.length; c++)
-            {
-                if(placeShipsBoard[r][c].getText() != shipBoardData[r][c])
-                {
-                    shipBoardData[r][c] = placeShipsBoard[r][c].getText();
-                }
-            }
-        }
-    }
-
     private void updateDataArray()
     {
         for(int r = 0; r<torpedoBoard.length; r++)
         {
-            for(int c = 0; c<torpedoBoard.length; c++)
+            for(int c = 0; c<torpedoBoard[r].length; c++)
             {
                 if(torpedoBoard[r][c].getText() != torpedoBoardData[r][c])
                 {
@@ -449,5 +367,22 @@ public class BattleshipGUI extends Application
                 }
             }
         }
+    }
+
+    private String[][] arrayElementTrim(String[][] data)
+    {
+        String[][]temp = new String[10][10];
+        for(int r = 0; r<data.length; r++)
+        {
+            for(int c = 0; c<data[r].length; c++)
+            {
+                temp[r][c] = data[r][c].trim();
+                if(temp[r][c].equals(""))
+                {
+                    temp[r][c] = "-";
+                }
+            }
+        }
+        return temp;
     }
 }
