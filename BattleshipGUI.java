@@ -27,7 +27,7 @@ import javafx.application.*;
 public class BattleshipGUI extends Application
 {   
     private Stage window;
-    private Scene getIpScene, placeShipsScene, gameScene;
+    private Scene getIpScene, placeShipsScene, fireScene;
 
     private Socket socket;
     private Scanner serverIn;
@@ -35,8 +35,11 @@ public class BattleshipGUI extends Application
 
     private Label title = new Label("Battleship");
     private Label message = new Label("Welcome!");
+    private Label title1 = new Label("Battleship");
+    private Label message1 = new Label("Welcome!");
     private TextField textField = new TextField ();
     private Button confirmPlacement = new Button("Place Ship");
+    private Button fireButton = new Button("Fire");
 
     private String[][] torpedoBoardData = new String[10][10];
     private String[][] shipBoardData = new String[10][10];
@@ -82,7 +85,7 @@ public class BattleshipGUI extends Application
         BorderPane.setAlignment(confirmPlacement, Pos.CENTER);
         BorderPane.setMargin(confirmPlacement, new Insets(0,25,0,0));
         confirmPlacement.setDisable(true);
-        
+
         //make a configure method
         for(int r = 0; r<shipBoardData.length; r++)
         {
@@ -102,13 +105,51 @@ public class BattleshipGUI extends Application
                 placeShipsBoard[r][c].setOnAction(this::selectClick);
             }
         }
-        
+
         GridPane gpS = addShipPlacementGridPane();
         bp.setCenter(gpS);     
         BorderPane.setMargin(gpS, new Insets(0,0,0,25));
         message.setText("Choose four blocks for the Cruiser to be placed");
-        
+
         placeShipsScene = new Scene(bp, 750,700);
+
+        //fireScene
+        // for(int r = 0; r<torpedoBoardData.length; r++)
+        // {
+            // for(int c = 0; c<torpedoBoardData[0].length; c++)
+            // {
+                // torpedoBoardData[r][c] = "   ";
+            // }
+        // }
+
+        // for(int r = 0; r<torpedoBoard.length; r++)
+        // {
+            // for(int c = 0; c<torpedoBoard.length; c++)
+            // {
+                // torpedoBoard[r][c] = new Button(torpedoBoardData[r][c]);
+                // torpedoBoard[r][c].setPrefSize(50,50);
+                // torpedoBoard[r][c].setStyle("-fx-background-color: #038cfc");
+                // torpedoBoard[r][c].setOnAction(this::fireClick);
+            // }
+        // }     
+
+        // BorderPane bp2 = new BorderPane();
+        // bp2.setTop(title1);
+        // bp2.setBottom(message1);
+        // BorderPane.setAlignment(title1, Pos.CENTER);
+        // BorderPane.setMargin(title1, new Insets(20,0,20,0));
+        // BorderPane.setAlignment(message1, Pos.CENTER);
+        // BorderPane.setMargin(message1, new Insets(20,0,40,0));
+
+        // bp2.setRight(fireButton);
+        // BorderPane.setAlignment(fireButton, Pos.CENTER);
+        // BorderPane.setMargin(fireButton, new Insets(0,25,0,0));
+        // fireButton.setDisable(true);
+        // GridPane gpT = addTorpedoGridPane();
+        // GridPane gpS2 = addShipPlacementGridPane();
+        // bp2.setCenter(gpT);
+        // bp2.setLeft(gpS2);
+        //fireScene = new Scene(bp2,750, 700);
 
         //Init
         stage.setTitle("Battleship");
@@ -148,15 +189,21 @@ public class BattleshipGUI extends Application
                             );
                             //clientOut.println("SETUP" + Arrays.deepToString(shipBoardData));
                         }
-                        // else if(response.startsWith("TURN"))
-                        // {
-                        // String arrayDataOp = response.substring(4,response.indexOf("&"));
-                        // shipBoardOp = Board.Arrayify(arrayDataOp);
-                        // String arrayData = response.substring(response.indexOf("&")+1);
-                        // shipBoard = Board.Arrayify(arrayData);
-                        // turn();
-                        // clientOut.println("TURN" + Arrays.deepToString(shipBoardOp));
-                        // }
+                        else if(response.startsWith("TURN"))
+                        {
+                            // Platform.runLater(
+                                // () -> {
+                                    // window.setScene(fireScene);
+                                    // message.setText("Choose a coordinate to fire at");
+                                // }
+                            // );
+                            // String arrayDataOp = response.substring(4,response.indexOf("&"));
+                            // shipBoardOp = Board.Arrayify(arrayDataOp);
+                            // String arrayData = response.substring(response.indexOf("&")+1);
+                            // shipBoard = Board.Arrayify(arrayData);
+                            // turn();
+                            // clientOut.println("TURN" + Arrays.deepToString(shipBoardOp));
+                        }
                         else if(response.startsWith("WAIT"))
                         {
                             message.setText("Waiting for opponent to finish turn...");
@@ -262,7 +309,7 @@ public class BattleshipGUI extends Application
         {
             confirmPlacement.setDisable(false);
         }
-        else if (checkValidPlacement(5))
+        else if (currentShipPlacementSymbol.equals("B") && checkValidPlacement(5))
         {
             confirmPlacement.setDisable(false);
         }
@@ -288,13 +335,14 @@ public class BattleshipGUI extends Application
                     }
                     else if(currentShipPlacementSymbol.equals("D"))
                     {
-                        placeShipsBoard[r][c].setStyle("-fx-background-color: #2a2b2e");
+                        placeShipsBoard[r][c].setStyle("-fx-background-color: #3b3636");
                     }
                     else if(currentShipPlacementSymbol.equals("B"))
                     {
-                        placeShipsBoard[r][c].setStyle("-fx-background-color: #131414");
+                        placeShipsBoard[r][c].setStyle("-fx-background-color: #2a2b2e");
                     }
                     placeShipsBoard[r][c].setDisable(true);
+                    placeShipsBoard[r][c].setStyle(placeShipsBoard[r][c].getStyle() + "; -fx-opacity: 1");
                 }
             }
         }
@@ -316,6 +364,7 @@ public class BattleshipGUI extends Application
                 for(int c = 0; c<placeShipsBoard.length; c++)
                 {
                     placeShipsBoard[r][c].setDisable(true);
+                    placeShipsBoard[r][c].setStyle(placeShipsBoard[r][c].getStyle() + "; -fx-opacity: 1");
                 }
             }
             message.setText("Please for your opponent to finish setting up their board...");
@@ -328,7 +377,7 @@ public class BattleshipGUI extends Application
     {
         //fix dis bc it only creates array of desired length not amount of blocks highlighted and also it checks if only 4 are in a row so go back to the for loop method
         int linedUp = 0;
-        int[][] selectedButtons = new int[length][2];
+        int[][] selectedButtons = new int[5][2];
         for(int r = 0; r<placeShipsBoard.length; r++)
         {
             for(int c = 0; c<placeShipsBoard.length; c++)
@@ -343,13 +392,27 @@ public class BattleshipGUI extends Application
         }
         if(linedUp == length)
         {
-            if((selectedButtons[0][0] == selectedButtons[1][0] && selectedButtons[1][0] == selectedButtons[2][0] && selectedButtons[2][0] == selectedButtons[3][0]) && (selectedButtons[0][1] == selectedButtons[1][1] - 1 && selectedButtons[1][1] == selectedButtons[2][1] - 1 && selectedButtons[2][1] == selectedButtons[3][1] - 1))
+            if(linedUp == 4)
             {
-                return true;
+                if((selectedButtons[0][0] == selectedButtons[1][0] && selectedButtons[1][0] == selectedButtons[2][0] && selectedButtons[2][0] == selectedButtons[3][0]) && (selectedButtons[0][1] == selectedButtons[1][1] - 1 && selectedButtons[1][1] == selectedButtons[2][1] - 1 && selectedButtons[2][1] == selectedButtons[3][1] - 1))
+                {
+                    return true;
+                }
+                if((selectedButtons[0][0] == selectedButtons[1][0] - 1 && selectedButtons[1][0] == selectedButtons[2][0] - 1 && selectedButtons[2][0] == selectedButtons[3][0] - 1) && (selectedButtons[0][1] == selectedButtons[1][1] && selectedButtons[1][1] == selectedButtons[2][1] && selectedButtons[2][1] == selectedButtons[3][1]))
+                {
+                    return true;
+                }
             }
-            if((selectedButtons[0][0] == selectedButtons[1][0] - 1 && selectedButtons[1][0] == selectedButtons[2][0] - 1 && selectedButtons[2][0] == selectedButtons[3][0] - 1) && (selectedButtons[0][1] == selectedButtons[1][1] && selectedButtons[1][1] == selectedButtons[2][1] && selectedButtons[2][1] == selectedButtons[3][1]))
+            if(linedUp == 5)
             {
-                return true;
+                if((selectedButtons[0][0] == selectedButtons[1][0] && selectedButtons[1][0] == selectedButtons[2][0] && selectedButtons[2][0] == selectedButtons[3][0] && selectedButtons[3][0] == selectedButtons[4][0]) && (selectedButtons[0][1] == selectedButtons[1][1] - 1 && selectedButtons[1][1] == selectedButtons[2][1] - 1 && selectedButtons[2][1] == selectedButtons[3][1] - 1 && selectedButtons[3][1] == selectedButtons[4][1] - 1))
+                {
+                    return true;
+                }
+                if((selectedButtons[0][0] == selectedButtons[1][0] - 1 && selectedButtons[1][0] == selectedButtons[2][0] - 1 && selectedButtons[2][0] == selectedButtons[3][0] - 1 && selectedButtons[3][0] == selectedButtons[4][0] -1) && (selectedButtons[0][1] == selectedButtons[1][1] && selectedButtons[1][1] == selectedButtons[2][1] && selectedButtons[2][1] == selectedButtons[3][1] && selectedButtons[3][1] == selectedButtons[4][1]))
+                {
+                    return true;
+                }
             }
         }
         return false;
