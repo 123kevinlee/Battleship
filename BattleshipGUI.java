@@ -1,3 +1,9 @@
+import java.util.Scanner;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.Arrays;
+import java.lang.String;
+
 import javafx.application.Application; 
 import javafx.scene.Scene; 
 import javafx.scene.control.*; 
@@ -19,9 +25,14 @@ import javafx.event.*;
  */
 public class BattleshipGUI extends Application
 {   
+    private Socket socket;
+    private Scanner serverIn;
+    private PrintWriter clientOut;
+
     private BorderPane border = new BorderPane();
     private Label title = new Label("Battleship");
     private Label message = new Label("Welcome!");
+    private TextField textField = new TextField ();
 
     private String[][] torpedoBoardData = new String[10][10];
     private String[][] shipBoardData = new String[10][10];
@@ -29,13 +40,106 @@ public class BattleshipGUI extends Application
     private Button[][] placeShipsBoard = new Button[10][10];
     private Button confirmPlacement = new Button("Place Ship");
 
+    private Stage stage;
+
+    private String ip = "";
     private String currentShipPlacementSymbol = "C";
 
     @Override
-    public void start(Stage stage)
+    public void start(Stage stage1)
     {
-        setupGame(stage);
-        setupShips();
+        stage = stage1;
+        getIP();     
+    }
+
+    private void play(Socket socket, Scanner serverIn, PrintWriter clientOut) throws Exception
+    {
+        Board.setBlankBoard(shipBoardData);
+        Board.setBlankBoard(torpedoBoardData);  
+        //setupGame();
+
+        try
+        {
+            while(serverIn.hasNextLine())
+            {
+                var response = serverIn.nextLine();
+                if(response.startsWith("MESSAGE"))
+                {
+                    message.setText(response.substring(8));
+                }
+                else if(response.startsWith("SETUP"))
+                {
+                    setupShips();
+                    //clientOut.println("SETUP" + Arrays.deepToString(shipBoardData));
+                }
+                // else if(response.startsWith("TURN"))
+                // {
+                // String arrayDataOp = response.substring(4,response.indexOf("&"));
+                // shipBoardOp = Board.Arrayify(arrayDataOp);
+                // String arrayData = response.substring(response.indexOf("&")+1);
+                // shipBoard = Board.Arrayify(arrayData);
+                // turn();
+                // clientOut.println("TURN" + Arrays.deepToString(shipBoardOp));
+                // }
+                else if(response.startsWith("WAIT"))
+                {
+                    message.setText("Waiting for opponent to finish turn...");
+                }
+                stage.showAndWait();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            socket.close();
+        }
+    }
+
+    private void getIP()
+    {
+        Scene scene = new Scene(border, 750,700);
+        stage.setTitle("Battleship");
+        stage.setScene(scene);
+        title.setFont(new Font("Arial", 24));
+        message.setFont(new Font("Arial", 18));
+        border.setTop(title);
+        border.setBottom(message);
+        BorderPane.setAlignment(title, Pos.CENTER);
+        BorderPane.setAlignment(message, Pos.CENTER);
+        Label question = new Label("Server IP:");        
+        Button enterIP = new Button("Join Server");
+        enterIP.setOnAction(this::ipClick);
+        HBox hb = new HBox();
+        hb.getChildren().addAll(question, textField, enterIP);
+        hb.setSpacing(10);
+        border.setCenter(hb);
+        BorderPane.setAlignment(hb, Pos.CENTER);
+
+        stage.show();  
+    }
+
+    private void ipClick(ActionEvent event)
+    {
+        try
+        {ipRun();}catch(Exception e){message.setText("Server either does not exist or is offline");}     
+    }
+
+    private void ipRun() throws Exception
+    {
+        ip = textField.getText();
+        String[] ipA = ip.split(":");
+        Socket socket = new Socket(ipA[0], Integer.parseInt(ipA[1]));
+        message.setText("Connected to server - waiting for an opponent...");
+        Scanner serverIn = new Scanner(socket.getInputStream());
+        PrintWriter clientOut = new PrintWriter(socket.getOutputStream(), true);
+        play(socket, serverIn, clientOut);
+        this.clientOut = clientOut;
+        this.serverIn = serverIn;
+        this.socket = socket;
+    }
+
+    private void turn()
+    {
         // for(int r = 0; r<torpedoBoardData.length; r++)
         // {
         // for(int c = 0; c<torpedoBoardData[0].length; c++)
@@ -58,7 +162,7 @@ public class BattleshipGUI extends Application
         // border.setCenter(addTorpedoGridPane());
     }
 
-    private void setupGame(Stage stage)
+    private void setupGame()
     {
         Scene scene = new Scene(border, 750,700);
         stage.setTitle("Battleship");
@@ -71,19 +175,26 @@ public class BattleshipGUI extends Application
         BorderPane.setAlignment(message, Pos.CENTER);
 
         stage.show();  
-
-        Board.setBlankBoard(shipBoardData);
-        Board.setBlankBoard(torpedoBoardData);  
     }
 
     private void setupShips()
     {
+        //Scene scene = new Scene(border, 750,700);
+        //stage.setTitle("Battleship");
+        //stage.setScene(scene);
+        title.setFont(new Font("Arial", 24));
+        message.setFont(new Font("Arial", 18));
+        border.setTop(title);
+        border.setBottom(message);
+        BorderPane.setAlignment(title, Pos.CENTER);
+        BorderPane.setAlignment(message, Pos.CENTER);
         confirmPlacement.setOnAction(this::confirmClick);
         border.setRight(confirmPlacement);
         BorderPane.setAlignment(confirmPlacement, Pos.CENTER);
         BorderPane.setMargin(confirmPlacement, new Insets(0,25,0,0));
         confirmPlacement.setDisable(true);
-
+        //stage.show(); 
+        
         for(int r = 0; r<shipBoardData.length; r++)
         {
             for(int c = 0; c<shipBoardData[0].length; c++)
@@ -234,6 +345,7 @@ public class BattleshipGUI extends Application
                 }
             }
             message.setText("Please for your opponent to finish setting up their board...");
+            clientOut.println("SETUP" + Arrays.deepToString(shipBoardData));
         }
         temp.setDisable(true);
     }
