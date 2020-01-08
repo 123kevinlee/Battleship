@@ -163,7 +163,15 @@ public class BattleshipGUI extends Application
         new Thread( () -> {
                 try {
                     String ip = textField.getText();
-                    String[] ipA = ip.split(":");
+                    String[] ipA = new String[2];
+                    try
+                    {
+                        ipA = ip.split(":");
+                    }
+                    catch(Exception e)
+                    {
+                        temp.setText("Invalid IP");
+                    }
                     Socket socket = new Socket(ipA[0], Integer.parseInt(ipA[1]));
                     temp.setText("Waiting for p2");
                     Scanner serverIn = new Scanner(socket.getInputStream());
