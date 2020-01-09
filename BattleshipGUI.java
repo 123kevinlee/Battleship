@@ -43,6 +43,7 @@ public class BattleshipGUI extends Application
 
     private String[][] torpedoBoardData = new String[10][10];
     private String[][] shipBoardData = new String[10][10];
+    private String[][] opShipBoardData = new String[10][10];
     private Button[][] torpedoBoard = new Button[10][10];
     private Button[][] placeShipsBoard = new Button[10][10];
     private  Button[][] placeShipsBoardCopy = new Button[10][10];
@@ -60,6 +61,8 @@ public class BattleshipGUI extends Application
 
         title.setFont(new Font("Arial", 24));
         message.setFont(new Font("Arial", 20));
+        title1.setFont(new Font("Arial", 24));
+        message1.setFont(new Font("Arial", 20));
 
         //getIpScene
         Label question = new Label("Server IP:");        
@@ -130,7 +133,7 @@ public class BattleshipGUI extends Application
                 torpedoBoard[r][c] = new Button(torpedoBoardData[r][c]);
                 torpedoBoard[r][c].setPrefSize(50,50);
                 torpedoBoard[r][c].setStyle("-fx-background-color: #038cfc");
-                torpedoBoard[r][c].setOnAction(this::fireClick);
+                torpedoBoard[r][c].setOnAction(this::targetClick);
             }
         }     
 
@@ -146,31 +149,32 @@ public class BattleshipGUI extends Application
         BorderPane.setAlignment(fireButton, Pos.CENTER);
         BorderPane.setMargin(fireButton, new Insets(0,25,0,0));
         fireButton.setDisable(true);
+        fireButton.setOnAction(this::fireClick);
         GridPane gpT = addTorpedoGridPane();
         //GridPane gpS2 = addShipPlacementGridPane();
         bp2.setCenter(gpT);
         //bp2.setLeft(gpS2);
-        
-        GridPane pane = new GridPane();
-        pane.setPadding(new Insets(10, 10, 10, 10));
-        pane.setMinSize(300, 300);
-        pane.setVgap(10);
-        pane.setHgap(10);
-           
-        for(int c = 1; c<=placeShipsBoardCopy.length;c++)
-        {
-            pane.add(new Label("   " + Character.toString((char)(c+64))),c,0);
-        }
-        for(int r = 1; r<=placeShipsBoardCopy.length; r++)
-        {
-            pane.add(new Label(Integer.toString(r)),0,r);
-            for(int c = 1; c<=placeShipsBoardCopy.length; c++)
-            {
-                pane.add(placeShipsBoardCopy[r-1][c-1],c,r);
-            }
-        }
+
+        // GridPane pane = new GridPane();
+        // pane.setPadding(new Insets(10, 10, 10, 10));
+        // pane.setMinSize(300, 300);
+        // pane.setVgap(10);
+        // pane.setHgap(10);
+
+        // for(int c = 1; c<=placeShipsBoardCopy.length;c++)
+        // {
+        // pane.add(new Label("   " + Character.toString((char)(c+64))),c,0);
+        // }
+        // for(int r = 1; r<=placeShipsBoardCopy.length; r++)
+        // {
+        // pane.add(new Label(Integer.toString(r)),0,r);
+        // for(int c = 1; c<=placeShipsBoardCopy.length; c++)
+        // {
+        // pane.add(placeShipsBoardCopy[r-1][c-1],c,r);
+        // }
+        // }
         //bp2.setTop(pane);
-        
+
         fireScene = new Scene(bp2,750, 700);
 
         //Init
@@ -208,6 +212,10 @@ public class BattleshipGUI extends Application
                         if(response.startsWith("MESSAGE"))
                         {
                             message.setText(response.substring(8));
+                            if(response.substring(8).startsWith("You have"))
+                            {
+                                //end game here
+                            }
                         }
                         else if(response.startsWith("SETUP"))
                         {
@@ -227,8 +235,8 @@ public class BattleshipGUI extends Application
                                 }
                             );
                             //placeShipsBoardCopy = placeShipsBoard;
-                            // String arrayDataOp = response.substring(4,response.indexOf("&"));
-                            // shipBoardOp = Board.Arrayify(arrayDataOp);
+                            String arrayDataOp = response.substring(4,response.indexOf("&"));
+                            opShipBoardData = Board.Arrayify(arrayDataOp);
                             // String arrayData = response.substring(response.indexOf("&")+1);
                             // shipBoard = Board.Arrayify(arrayData);
                             // turn();
@@ -292,19 +300,76 @@ public class BattleshipGUI extends Application
         return pane;
     }
 
-    private void fireClick(ActionEvent event)
+    private void targetClick(ActionEvent event)
     {
         Button temp = (Button)(event.getSource());
-        if(temp.getText() != "X")
+        if(!temp.getText().equals("X"))
         {
             temp.setText("X");
+            for(int r = 0; r<torpedoBoard.length; r++)
+            {
+                for(int c = 0; c<torpedoBoard.length; c++)
+                {
+                    if(!torpedoBoard[r][c].getText().equals("X"))
+                    {
+                        torpedoBoard[r][c].setDisable(true);
+                    }
+                    torpedoBoard[r][c].setStyle(torpedoBoard[r][c].getStyle() + "; -fx-opacity: 1");
+                }
+            }
+            fireButton.setDisable(false);
         }
         else
         {
             temp.setText("   ");
+            for(int r = 0; r<torpedoBoard.length; r++)
+            {
+                for(int c = 0; c<torpedoBoard.length; c++)
+                {
+                    if(!torpedoBoard[r][c].getText().equals("X"))
+                    {
+                        torpedoBoard[r][c].setDisable(false);
+                    }
+                    torpedoBoard[r][c].setStyle(torpedoBoard[r][c].getStyle() + "; -fx-opacity: 1");
+                }
+            }
+            fireButton.setDisable(true);
         }
         updateTorpedoDataArray();
         //add miss stuff
+    }
+
+    private void fireClick(ActionEvent event)
+    {
+        for(int r = 0; r < torpedoBoard.length; r++)
+        {
+            for(int c = 0; c < torpedoBoard[r].length; c++)
+            {
+                if(torpedoBoard[r][c].getText().equals("X") && !opShipBoardData[r][c].equals("-"))
+                {
+                    opShipBoardData[r][c].equals("F");
+                    message1.setText("You have hit a ship!");
+                }
+                else if (torpedoBoard[r][c].getText().equals("X") && opShipBoardData[r][c].equals("-"))
+                {
+                    torpedoBoard[r][c].setText("O");
+                    message1.setText("You have missed!");
+                }
+            }
+        }
+        for(int r = 0; r<torpedoBoard.length; r++)
+        {
+            for(int c = 0; c<torpedoBoard.length; c++)
+            {
+                if(!torpedoBoard[r][c].getText().equals("X"))
+                {
+                    torpedoBoard[r][c].setDisable(false);
+                }
+                torpedoBoard[r][c].setStyle(torpedoBoard[r][c].getStyle() + "; -fx-opacity: 1");
+            }
+        }
+        fireButton.setDisable(true);
+        clientOut.println("TURN" + Arrays.deepToString(opShipBoardData));
     }
 
     private void selectClick(ActionEvent event)
