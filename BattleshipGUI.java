@@ -174,7 +174,7 @@ public class BattleshipGUI extends Application
         // }
         // }
         //bp2.setTop(pane);
-        
+
         // HBox hb1 = new HBox();
         // hb1.getChildren().addAll(gpT, gpS);
         // hb1.setSpacing(10);
@@ -216,11 +216,19 @@ public class BattleshipGUI extends Application
                         var response = serverIn.nextLine();
                         if(response.startsWith("MESSAGE"))
                         {
-                            message.setText(response.substring(8));
-                            if(response.substring(8).startsWith("You have"))
-                            {
-                                //end game here
-                            }
+                            Platform.runLater(
+                                () -> {
+                                    message.setText(response.substring(8));
+                                }
+                            );            
+                            // if(response.substring(8).contains("won") || response.substring(8).contains("lost"))
+                            // {
+                                // // Platform.runLater(
+                                    // // () -> {
+                                        // // message.setText(response.substring(8));
+                                    // // }
+                                // // );  
+                            // }
                         }
                         else if(response.startsWith("SETUP"))
                         {
@@ -235,6 +243,17 @@ public class BattleshipGUI extends Application
                         {
                             Platform.runLater(
                                 () -> {
+                                    for(int r = 0; r<torpedoBoard.length; r++)
+                                    {
+                                        for(int c = 0; c<torpedoBoard.length; c++)
+                                        {
+                                            if(!torpedoBoard[r][c].getText().equals("X"))
+                                            {
+                                                torpedoBoard[r][c].setDisable(false);
+                                            }
+                                            torpedoBoard[r][c].setStyle(torpedoBoard[r][c].getStyle() + "; -fx-opacity: 1");
+                                        }
+                                    }
                                     window.setScene(fireScene);
                                     message1.setText("Choose a coordinate to fire at");
                                 }
@@ -352,7 +371,7 @@ public class BattleshipGUI extends Application
             {
                 if(torpedoBoard[r][c].getText().equals("X") && !opShipBoardData[r][c].equals("-"))
                 {
-                    opShipBoardData[r][c].equals("F");
+                    opShipBoardData[r][c] = "F";
                     message1.setText("You have hit a ship!");
                 }
                 else if (torpedoBoard[r][c].getText().equals("X") && opShipBoardData[r][c].equals("-"))
@@ -366,10 +385,11 @@ public class BattleshipGUI extends Application
         {
             for(int c = 0; c<torpedoBoard.length; c++)
             {
-                if(!torpedoBoard[r][c].getText().equals("X"))
-                {
-                    torpedoBoard[r][c].setDisable(false);
-                }
+                // if(!torpedoBoard[r][c].getText().equals("X"))
+                // {
+                // torpedoBoard[r][c].setDisable(false);
+                // }
+                torpedoBoard[r][c].setDisable(true);
                 torpedoBoard[r][c].setStyle(torpedoBoard[r][c].getStyle() + "; -fx-opacity: 1");
             }
         }
