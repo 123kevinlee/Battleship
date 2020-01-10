@@ -174,6 +174,11 @@ public class BattleshipGUI extends Application
         // }
         // }
         //bp2.setTop(pane);
+        
+        // HBox hb1 = new HBox();
+        // hb1.getChildren().addAll(gpT, gpS);
+        // hb1.setSpacing(10);
+        // bp2.setCenter(hb1);
 
         fireScene = new Scene(bp2,750, 700);
 
