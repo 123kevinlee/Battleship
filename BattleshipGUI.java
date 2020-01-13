@@ -201,10 +201,19 @@ public class BattleshipGUI extends Application
                     }
                     catch(Exception e)
                     {
-                        temp.setText("Invalid IP");
+                        Platform.runLater(
+                            () -> {
+                                temp.setText("Invalid IP");
+                            }
+                        );
+
                     }
                     Socket socket = new Socket(ipA[0], Integer.parseInt(ipA[1]));
-                    temp.setText("Waiting for p2");
+                    Platform.runLater(
+                        () -> {
+                            temp.setText("Waiting for p2");
+                        }
+                    );
                     Scanner serverIn = new Scanner(socket.getInputStream());
                     PrintWriter clientOut = new PrintWriter(socket.getOutputStream(), true);
                     this.clientOut = clientOut;
@@ -223,11 +232,11 @@ public class BattleshipGUI extends Application
                             );            
                             // if(response.substring(8).contains("won") || response.substring(8).contains("lost"))
                             // {
-                                // // Platform.runLater(
-                                    // // () -> {
-                                        // // message.setText(response.substring(8));
-                                    // // }
-                                // // );  
+                            // // Platform.runLater(
+                            // // () -> {
+                            // // message.setText(response.substring(8));
+                            // // }
+                            // // );  
                             // }
                         }
                         else if(response.startsWith("SETUP"))
@@ -247,7 +256,8 @@ public class BattleshipGUI extends Application
                                     {
                                         for(int c = 0; c<torpedoBoard.length; c++)
                                         {
-                                            if(!torpedoBoard[r][c].getText().equals("X"))
+                                            //if(!torpedoBoard[r][c].getText().equals("X")) //#d10000
+                                            if(!torpedoBoard[r][c].getStyle().startsWith("-fx-background-color: #d10000") && !torpedoBoard[r][c].getStyle().equals("-fx-background-color: #6b2096") )
                                             {
                                                 torpedoBoard[r][c].setDisable(false);
                                             }
@@ -258,13 +268,8 @@ public class BattleshipGUI extends Application
                                     message1.setText("Choose a coordinate to fire at");
                                 }
                             );
-                            //placeShipsBoardCopy = placeShipsBoard;
                             String arrayDataOp = response.substring(4,response.indexOf("&"));
                             opShipBoardData = Board.Arrayify(arrayDataOp);
-                            // String arrayData = response.substring(response.indexOf("&")+1);
-                            // shipBoard = Board.Arrayify(arrayData);
-                            // turn();
-                            // clientOut.println("TURN" + Arrays.deepToString(shipBoardOp));
                         }
                         else if(response.startsWith("WAIT"))
                         {
@@ -327,14 +332,17 @@ public class BattleshipGUI extends Application
     private void targetClick(ActionEvent event)
     {
         Button temp = (Button)(event.getSource());
-        if(!temp.getText().equals("X"))
+        //if(!temp.getText().equals("X")) // #caf218
+        if(!temp.getStyle().startsWith("-fx-background-color: #caf218"))
         {
-            temp.setText("X");
+            //temp.setText("X");
+            temp.setStyle("-fx-background-color: #caf218");
             for(int r = 0; r<torpedoBoard.length; r++)
             {
                 for(int c = 0; c<torpedoBoard.length; c++)
                 {
-                    if(!torpedoBoard[r][c].getText().equals("X"))
+                    //if(!torpedoBoard[r][c].getText().equals("X"))
+                    if(!temp.getStyle().startsWith("-fx-background-color: #caf218"))
                     {
                         torpedoBoard[r][c].setDisable(true);
                     }
@@ -345,12 +353,14 @@ public class BattleshipGUI extends Application
         }
         else
         {
-            temp.setText("   ");
+            //temp.setText("   "); //#038cfc
+            temp.setStyle("-fx-background-color: #038cfc");
             for(int r = 0; r<torpedoBoard.length; r++)
             {
                 for(int c = 0; c<torpedoBoard.length; c++)
                 {
-                    if(!torpedoBoard[r][c].getText().equals("X"))
+                    //if(!torpedoBoard[r][c].getText().equals("X"))
+                    if(!temp.getStyle().startsWith("-fx-background-color: #d10000") && !temp.getStyle().startsWith("-fx-background-color: #6b2096"))
                     {
                         torpedoBoard[r][c].setDisable(false);
                     }
@@ -369,14 +379,18 @@ public class BattleshipGUI extends Application
         {
             for(int c = 0; c < torpedoBoard[r].length; c++)
             {
-                if(torpedoBoard[r][c].getText().equals("X") && !opShipBoardData[r][c].equals("-"))
+                //if(torpedoBoard[r][c].getText().equals("X") && !opShipBoardData[r][c].equals("-")) //#d10000
+                if(torpedoBoard[r][c].getStyle().startsWith("-fx-background-color: #caf218") && !opShipBoardData[r][c].equals("-"))
                 {
                     opShipBoardData[r][c] = "F";
+                    torpedoBoard[r][c].setStyle("-fx-background-color: #d10000");
                     message1.setText("You have hit a ship!");
                 }
-                else if (torpedoBoard[r][c].getText().equals("X") && opShipBoardData[r][c].equals("-"))
+                //else if (torpedoBoard[r][c].getText().equals("X") && opShipBoardData[r][c].equals("-"))
+                else if (torpedoBoard[r][c].getStyle().startsWith("-fx-background-color: #caf218") && opShipBoardData[r][c].equals("-"))
                 {
-                    torpedoBoard[r][c].setText("O");
+                    //torpedoBoard[r][c].setText("O"); //#6b2096
+                    torpedoBoard[r][c].setStyle("-fx-background-color: #6b2096");
                     message1.setText("You have missed!");
                 }
             }
