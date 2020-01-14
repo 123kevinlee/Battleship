@@ -46,9 +46,13 @@ public class BattleshipGUI extends Application
     private String[][] opShipBoardData = new String[10][10];
     private Button[][] torpedoBoard = new Button[10][10];
     private Button[][] placeShipsBoard = new Button[10][10];
-    private  Button[][] placeShipsBoardCopy = new Button[10][10];
 
     private String currentShipPlacementSymbol = "C";
+
+    private String lightBlue = "-fx-background-color: #038cfc";
+    private String red = "-fx-background-color: #d10000";
+    private String yellow = "-fx-background-color: #caf218";
+    private String purple = "-fx-background-color: #6b2096";
 
     public static void main(String[] args) {
         launch(args);
@@ -230,14 +234,6 @@ public class BattleshipGUI extends Application
                                     message.setText(response.substring(8));
                                 }
                             );            
-                            // if(response.substring(8).contains("won") || response.substring(8).contains("lost"))
-                            // {
-                            // // Platform.runLater(
-                            // // () -> {
-                            // // message.setText(response.substring(8));
-                            // // }
-                            // // );  
-                            // }
                         }
                         else if(response.startsWith("SETUP"))
                         {
@@ -257,7 +253,7 @@ public class BattleshipGUI extends Application
                                         for(int c = 0; c<torpedoBoard.length; c++)
                                         {
                                             //if(!torpedoBoard[r][c].getText().equals("X")) //#d10000
-                                            if(!torpedoBoard[r][c].getStyle().startsWith("-fx-background-color: #d10000") && !torpedoBoard[r][c].getStyle().equals("-fx-background-color: #6b2096") )
+                                            if(!torpedoBoard[r][c].getStyle().startsWith(red) && !torpedoBoard[r][c].startsWith(purple))
                                             {
                                                 torpedoBoard[r][c].setDisable(false);
                                             }
@@ -333,16 +329,16 @@ public class BattleshipGUI extends Application
     {
         Button temp = (Button)(event.getSource());
         //if(!temp.getText().equals("X")) // #caf218
-        if(!temp.getStyle().startsWith("-fx-background-color: #caf218"))
+        if(!temp.getStyle().startsWith(yellow))
         {
             //temp.setText("X");
-            temp.setStyle("-fx-background-color: #caf218");
+            temp.setStyle(yellow);
             for(int r = 0; r<torpedoBoard.length; r++)
             {
                 for(int c = 0; c<torpedoBoard.length; c++)
                 {
                     //if(!torpedoBoard[r][c].getText().equals("X"))
-                    if(!temp.getStyle().startsWith("-fx-background-color: #caf218"))
+                    if(!temp.getStyle().equals(yellow))
                     {
                         torpedoBoard[r][c].setDisable(true);
                     }
@@ -354,13 +350,13 @@ public class BattleshipGUI extends Application
         else
         {
             //temp.setText("   "); //#038cfc
-            temp.setStyle("-fx-background-color: #038cfc");
+            temp.setStyle(lightBlue);
             for(int r = 0; r<torpedoBoard.length; r++)
             {
                 for(int c = 0; c<torpedoBoard.length; c++)
                 {
                     //if(!torpedoBoard[r][c].getText().equals("X"))
-                    if(!temp.getStyle().startsWith("-fx-background-color: #d10000") && !temp.getStyle().startsWith("-fx-background-color: #6b2096"))
+                    if(!temp.getStyle().startsWith(red) && !temp.getStyle().startsWith(purple))
                     {
                         torpedoBoard[r][c].setDisable(false);
                     }
@@ -380,17 +376,17 @@ public class BattleshipGUI extends Application
             for(int c = 0; c < torpedoBoard[r].length; c++)
             {
                 //if(torpedoBoard[r][c].getText().equals("X") && !opShipBoardData[r][c].equals("-")) //#d10000
-                if(torpedoBoard[r][c].getStyle().startsWith("-fx-background-color: #caf218") && !opShipBoardData[r][c].equals("-"))
+                if(torpedoBoard[r][c].getStyle().startsWith(yellow) && !opShipBoardData[r][c].equals("-"))
                 {
                     opShipBoardData[r][c] = "F";
-                    torpedoBoard[r][c].setStyle("-fx-background-color: #d10000");
+                    torpedoBoard[r][c].setStyle(red);
                     message1.setText("You have hit a ship!");
                 }
                 //else if (torpedoBoard[r][c].getText().equals("X") && opShipBoardData[r][c].equals("-"))
-                else if (torpedoBoard[r][c].getStyle().startsWith("-fx-background-color: #caf218") && opShipBoardData[r][c].equals("-"))
+                else if (torpedoBoard[r][c].getStyle().startsWith(yellow) && opShipBoardData[r][c].equals("-"))
                 {
                     //torpedoBoard[r][c].setText("O"); //#6b2096
-                    torpedoBoard[r][c].setStyle("-fx-background-color: #6b2096");
+                    torpedoBoard[r][c].setStyle(purple);
                     message1.setText("You have missed!");
                 }
             }
@@ -492,7 +488,6 @@ public class BattleshipGUI extends Application
 
     private boolean checkValidPlacement(int length)
     {
-        //fix dis bc it only creates array of desired length not amount of blocks highlighted and also it checks if only 4 are in a row so go back to the for loop method
         int linedUp = 0;
         int[][] selectedButtons = new int[5][2];
         for(int r = 0; r<placeShipsBoard.length; r++)
