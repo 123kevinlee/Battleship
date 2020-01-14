@@ -52,7 +52,7 @@ public class BattleshipGUI extends Application
     private String lightBlue = "-fx-background-color: #038cfc";
     private String red = "-fx-background-color: #d10000";
     private String yellow = "-fx-background-color: #caf218";
-    private String purple = "-fx-background-color: #6b2096";
+    private String orange = "-fx-background-color: #fab623";
 
     public static void main(String[] args) {
         launch(args);
@@ -253,7 +253,7 @@ public class BattleshipGUI extends Application
                                         for(int c = 0; c<torpedoBoard.length; c++)
                                         {
                                             //if(!torpedoBoard[r][c].getText().equals("X")) //#d10000
-                                            if(!torpedoBoard[r][c].getStyle().startsWith(red) && !torpedoBoard[r][c].startsWith(purple))
+                                            if(!torpedoBoard[r][c].getStyle().startsWith(red) && !torpedoBoard[r][c].getStyle().startsWith(orange) )
                                             {
                                                 torpedoBoard[r][c].setDisable(false);
                                             }
@@ -274,7 +274,11 @@ public class BattleshipGUI extends Application
                     }
                 }
                 catch(Exception ex) {
-                    temp.setText(ex.toString());
+                    Platform.runLater(
+                        () -> {
+                            temp.setText(ex.toString());
+                        }
+                    );
                 }
             }).start();
     }
@@ -338,7 +342,7 @@ public class BattleshipGUI extends Application
                 for(int c = 0; c<torpedoBoard.length; c++)
                 {
                     //if(!torpedoBoard[r][c].getText().equals("X"))
-                    if(!temp.getStyle().equals(yellow))
+                    if(!torpedoBoard[r][c].getStyle().startsWith(yellow))
                     {
                         torpedoBoard[r][c].setDisable(true);
                     }
@@ -356,7 +360,7 @@ public class BattleshipGUI extends Application
                 for(int c = 0; c<torpedoBoard.length; c++)
                 {
                     //if(!torpedoBoard[r][c].getText().equals("X"))
-                    if(!temp.getStyle().startsWith(red) && !temp.getStyle().startsWith(purple))
+                    if(!temp.getStyle().startsWith(red) && !temp.getStyle().startsWith(orange))
                     {
                         torpedoBoard[r][c].setDisable(false);
                     }
@@ -386,7 +390,7 @@ public class BattleshipGUI extends Application
                 else if (torpedoBoard[r][c].getStyle().startsWith(yellow) && opShipBoardData[r][c].equals("-"))
                 {
                     //torpedoBoard[r][c].setText("O"); //#6b2096
-                    torpedoBoard[r][c].setStyle(purple);
+                    torpedoBoard[r][c].setStyle(orange);
                     message1.setText("You have missed!");
                 }
             }
